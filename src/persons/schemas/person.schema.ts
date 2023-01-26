@@ -1,12 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
+import { IPerson } from 'src/persons/interfaces/person.interface'
 
 import { CommunicationMethod, Gender, PersonRole, Subscription } from '../interfaces/persons.type'
 
 export type PersonDocument = Person & Document
 
 @Schema()
-export class Person {
+export class Person implements IPerson {
   @Prop({ type: [String], default: [] })
   addressIds: string[]
 
@@ -61,4 +62,5 @@ export class Person {
   @Prop({ default: '' })
   whatsApp: string
 }
+
 export const PersonSchema = SchemaFactory.createForClass(Person)
