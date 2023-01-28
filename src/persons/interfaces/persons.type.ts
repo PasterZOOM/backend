@@ -1,25 +1,31 @@
 export enum CommunicationMethod {
-  EMAIL = 'email',
-  INSTAGRAM = 'instagram',
-  PHONE = 'phone',
-  TELEGRAM = 'telegram',
-  VIBER = 'viber',
-  VK = 'vk',
-  WHATS_APP = 'whatsApp',
+  EMAIL = 'EMAIL',
+  INSTAGRAM = 'INSTAGRAM',
+  PHONE = 'PHONE',
+
+  TELEGRAM = 'TELEGRAM',
+  VIBER = 'VIBER',
+  VK = 'VK',
+  WHATS_APP = 'WHATS_APP',
 }
 export enum Subscription {
-  All = 'all',
-  NEWS = 'news',
-  NONE = 'none',
-  PROMOTIONS = 'promotions',
+  All = 'All',
+  NEWS = 'NEWS',
+  NONE = 'NONE',
+  PROMOTIONS = 'PROMOTIONS',
 }
 export enum PersonRole {
-  BANNED = 'banned',
-  CUSTOMER = 'customer',
-  LID = 'lid',
+  BANNED = 'BANNED',
+  CUSTOMER = 'CUSTOMER',
+  LID = 'LID',
 }
 export enum Gender {
-  NONE = 'none',
-  MAN = 'man',
-  WOMAN = 'woman',
+  NONE = 'NONE',
+  MAN = 'MAN',
+  WOMAN = 'WOMAN',
 }
+
+export type TCommunicationMethod = keyof typeof CommunicationMethod
+export type TSubscription = keyof typeof Subscription
+export type TPersonRole = keyof typeof PersonRole
+export type TGender = keyof typeof Gender

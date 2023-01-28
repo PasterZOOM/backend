@@ -32,4 +32,8 @@ export class PersonsService {
   async remove(id: string): Promise<IPerson> {
     return this.PersonModel.findByIdAndRemove(id)
   }
+
+  async addAddress(id: string, addressIds: string[]): Promise<IPerson> {
+    return this.PersonModel.findByIdAndUpdate(id, { addressIds })
+  }
 }

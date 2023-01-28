@@ -18,7 +18,7 @@ import { PersonsService } from './persons.service'
 
 @Controller('persons')
 export class PersonsController {
-  constructor(readonly personsService: PersonsService) {}
+  constructor(private readonly personsService: PersonsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

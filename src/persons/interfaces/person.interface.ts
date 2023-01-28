@@ -1,25 +1,26 @@
 import {
-  CommunicationMethod,
-  Gender,
-  PersonRole,
-  Subscription,
+  TCommunicationMethod,
+  TGender,
+  TPersonRole,
+  TSubscription,
 } from 'src/persons/interfaces/persons.type'
 
 export interface IPerson {
+  _id: string
   addressIds: string[]
-  communicationMethod: CommunicationMethod
+  communicationMethod: TCommunicationMethod
   created: string
   description: string
   email: string
   firstName: string
-  gender: Gender
+  gender: TGender
   instagram: string
   lastName: string
   orderIds: string[]
   patronymic: string
   phone: string
-  role: PersonRole
-  subscription: Subscription
+  role: TPersonRole
+  subscription: TSubscription
   telegram: string
   viber: string
   vk: string

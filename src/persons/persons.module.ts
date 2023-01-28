@@ -10,6 +10,7 @@ import { PersonsService } from './persons.service'
   imports: [MongooseModule.forFeature([{ name: Person.name, schema: PersonSchema }])],
   controllers: [PersonsController],
   providers: [PersonsService],
+  exports: [PersonsService],
 })
 export class PersonsModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

@@ -1,13 +1,13 @@
-import { CommunicationMethod, Gender, Subscription } from 'src/persons/interfaces/persons.type'
+import { TCommunicationMethod, TGender, TSubscription } from 'src/persons/interfaces/persons.type'
 
 export class CreatePersonDto {
-  readonly communicationMethod: CommunicationMethod
+  readonly communicationMethod: TCommunicationMethod
 
   readonly email?: string
 
   readonly firstName: string
 
-  readonly gender?: Gender
+  readonly gender?: TGender
 
   readonly instagram: string
 
@@ -17,7 +17,7 @@ export class CreatePersonDto {
 
   readonly phone: string
 
-  readonly subscription?: Subscription
+  readonly subscription?: TSubscription
 
   readonly telegram?: string
 
