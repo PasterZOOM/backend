@@ -29,7 +29,7 @@ export class AddressesController {
 
       const createdAddress = await this.addressesService.create(createAddressDto)
 
-      await this.personsService.addAddress(person._id, [createdAddress._id, ...person.addressIds])
+      await this.personsService.push(person._id, { addressIds: createdAddress._id })
 
       return createdAddress
     } catch (e) {
@@ -46,7 +46,7 @@ export class AddressesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<IAddress> {
+  async findOne(@Param('id') id: string): Promise<IAddress> {
     return this.addressesService.findOne(id)
   }
 
@@ -55,25 +55,17 @@ export class AddressesController {
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto
   ): Promise<IAddress> {
-    let address = await this.addressesService.findOne(id)
-
-    address = { ...address, ...updateAddressDto }
-
-    return this.addressesService.update(id, address)
+    return this.addressesService.update(id, updateAddressDto)
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<IAddress> {
     try {
       const address = await this.findOne(id)
-
       const owner = await this.personsService.findOne(address.personId)
 
       if (owner) {
-        await this.personsService.addAddress(
-          owner._id,
-          owner.addressIds.filter(addressId => addressId !== id)
-        )
+        await this.personsService.pull(owner._id, { addressIds: id })
       }
 
       return this.addressesService.remove(id)
@@ -83,5 +75,10 @@ export class AddressesController {
         description: e.message,
       })
     }
+  }
+
+  @Patch(':id/main')
+  async makeAddressMain(@Param('id') id: string): Promise<{ addressIds: string[] }> {
+    return this.personsService.makeAddressMain(id)
   }
 }

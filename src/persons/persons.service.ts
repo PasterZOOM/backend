@@ -18,7 +18,7 @@ export class PersonsService {
   }
 
   async findAll(): Promise<IPerson[]> {
-    return this.PersonModel.find().exec()
+    return this.PersonModel.find().sort().exec()
   }
 
   async findOne(id: string): Promise<IPerson> {
@@ -33,7 +33,33 @@ export class PersonsService {
     return this.PersonModel.findByIdAndRemove(id)
   }
 
-  async addAddress(id: string, addressIds: string[]): Promise<IPerson> {
-    return this.PersonModel.findByIdAndUpdate(id, { addressIds })
+  async push(
+    id: string,
+    addToSet: { [key in keyof Partial<Pick<IPerson, 'addressIds' | 'orderIds'>>]: string }
+  ): Promise<IPerson> {
+    return this.PersonModel.findByIdAndUpdate(id, { $addToSet: addToSet })
+  }
+
+  async pull(
+    id: string,
+    pulled: { [key in keyof Partial<Pick<IPerson, 'addressIds' | 'orderIds'>>]: string }
+  ): Promise<IPerson> {
+    return this.PersonModel.findByIdAndUpdate(id, { $pull: pulled })
+  }
+
+  async makeAddressMain(id: string): Promise<{ addressIds: string[] }> {
+    const { _id, addressIds } = await this.PersonModel.findOne({ addressIds: id }, [
+      '_id',
+      'addressIds',
+    ])
+    const mainIndex = addressIds.findIndex(addressId => addressId === id)
+    const mainAddress = addressIds.splice(mainIndex, 1)
+    const addressesWithNewMain = [...mainAddress, ...addressIds]
+
+    return this.PersonModel.findByIdAndUpdate(
+      _id,
+      { addressIds: addressesWithNewMain },
+      { projection: ['addressIds'] }
+    )
   }
 }

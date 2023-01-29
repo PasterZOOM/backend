@@ -7,7 +7,11 @@ import { AppService } from './app.service'
 import { PersonsModule } from './persons/persons.module'
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://localhost:27017'), PersonsModule, AddressesModule],
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost:27017', { dbName: 'Pi_Straps' }),
+    PersonsModule,
+    AddressesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
