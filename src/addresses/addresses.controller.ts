@@ -1,13 +1,5 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { PersonsService } from 'src/persons/persons.service'
 
 import { AddressesService } from './addresses.service'
@@ -33,10 +25,7 @@ export class AddressesController {
 
       return createdAddress
     } catch (e) {
-      throw new BadRequestException('Person with this id is not in the database', {
-        cause: new Error(),
-        description: e.message,
-      })
+      throw new BadIdException('person', e)
     }
   }
 
@@ -70,10 +59,7 @@ export class AddressesController {
 
       return this.addressesService.remove(id)
     } catch (e) {
-      throw new BadRequestException('Address with this id is not in the database', {
-        cause: new Error(),
-        description: e.message,
-      })
+      throw new BadIdException('address', e)
     }
   }
 

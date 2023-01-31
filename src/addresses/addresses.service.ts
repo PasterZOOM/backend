@@ -12,9 +12,9 @@ export class AddressesService {
   constructor(@InjectModel(Address.name) private AddressModel: Model<AddressDocument>) {}
 
   async create(createAddressDto: CreateAddressDto): Promise<IAddress> {
-    const newPerson = new this.AddressModel(createAddressDto)
+    const newAddress = new this.AddressModel(createAddressDto)
 
-    return newPerson.save()
+    return newAddress.save()
   }
 
   async findAll(): Promise<IAddress[]> {
