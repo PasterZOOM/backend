@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { Person, PersonDocument } from 'src/persons/schemas/person.schema'
 
 import { CreatePersonDto } from './dto/create-person.dto'
 import { UpdatePersonDto } from './dto/update-person.dto'
 import { IPerson } from './interfaces/person.interface'
+import { Person, PersonDocument } from './schemas/person.schema'
 
 @Injectable()
 export class PersonsService {

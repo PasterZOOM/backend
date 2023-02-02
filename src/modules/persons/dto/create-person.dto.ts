@@ -1,4 +1,4 @@
-import { TCommunicationMethod, TGender, TSubscription } from 'src/persons/interfaces/persons.type'
+import { TCommunicationMethod, TGender, TSubscription } from '../interfaces/persons.type'
 
 export class CreatePersonDto {
   readonly communicationMethod: TCommunicationMethod

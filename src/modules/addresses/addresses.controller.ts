@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
-import { PersonsService } from 'src/persons/persons.service'
+
+import { PersonsService } from '../persons/persons.service'
 
 import { AddressesService } from './addresses.service'
 import { CreateAddressDto } from './dto/create-address.dto'

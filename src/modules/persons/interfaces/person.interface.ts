@@ -1,9 +1,4 @@
-import {
-  TCommunicationMethod,
-  TGender,
-  TPersonRole,
-  TSubscription,
-} from 'src/persons/interfaces/persons.type'
+import { TCommunicationMethod, TGender, TPersonRole, TSubscription } from './persons.type'
 
 export interface IPerson {
   _id: string

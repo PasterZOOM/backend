@@ -1,4 +1,4 @@
-import { TDeliveryMethod, TDeliveryPlace } from 'src/addresses/interfaces/addresses.type'
+import { TDeliveryMethod, TDeliveryPlace } from '../interfaces/addresses.type'
 
 export class CreateAddressDto {
   readonly apartment?: string

@@ -1,5 +1,6 @@
 import { NotFoundException } from '@nestjs/common'
-import { toCapitalizeWord } from 'src/common/utils/string/toCapitalizeWord'
+
+import { toCapitalizeWord } from '../utils/string/toCapitalizeWord'
 
 export class BadIdException extends NotFoundException {
   constructor(essence: string, e) {

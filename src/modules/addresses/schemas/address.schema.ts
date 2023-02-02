@@ -1,12 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-import { IAddress } from 'src/addresses/interfaces/address.interface'
+
+import { IAddress } from '../interfaces/address.interface'
 import {
-  DeliveryMethod,
-  DeliveryPlace,
+  EDeliveryMethod,
+  EDeliveryPlace,
   TDeliveryMethod,
   TDeliveryPlace,
-} from 'src/addresses/interfaces/addresses.type'
+} from '../interfaces/addresses.type'
 
 export type AddressDocument = Address & Document
 
@@ -27,7 +28,7 @@ export class Address implements Omit<IAddress, '_id'> {
   @Prop({ default: '' })
   personId: string
 
-  @Prop({ default: DeliveryPlace.ADDRESS })
+  @Prop({ default: EDeliveryPlace.ADDRESS })
   deliveryPlace: TDeliveryPlace
 
   @Prop({ default: '' })
@@ -42,7 +43,7 @@ export class Address implements Omit<IAddress, '_id'> {
   @Prop({ default: '' })
   street: string
 
-  @Prop({ default: DeliveryMethod.BEL_POST })
+  @Prop({ default: EDeliveryMethod.BEL_POST })
   transportCompany: TDeliveryMethod
 }
 

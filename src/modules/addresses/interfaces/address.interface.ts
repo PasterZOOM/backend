@@ -1,4 +1,4 @@
-import { TDeliveryMethod, TDeliveryPlace } from 'src/addresses/interfaces/addresses.type'
+import { TDeliveryMethod, TDeliveryPlace } from './addresses.type'
 
 export interface IAddress {
   _id: string

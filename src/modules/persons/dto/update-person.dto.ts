@@ -1,5 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types'
-import { TPersonRole } from 'src/persons/interfaces/persons.type'
+
+import { TPersonRole } from '../interfaces/persons.type'
 
 import { CreatePersonDto } from './create-person.dto'
 

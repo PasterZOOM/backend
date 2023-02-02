@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { Address, AddressSchema } from 'src/addresses/schemas/address.schema'
-import { PersonsModule } from 'src/persons/persons.module'
+
+import { PersonsModule } from '../persons/persons.module'
 
 import { AddressesController } from './addresses.controller'
 import { AddressesService } from './addresses.service'
+import { Address, AddressSchema } from './schemas/address.schema'
 
 @Module({
   imports: [

@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-import { IPerson } from 'src/persons/interfaces/person.interface'
 
+import { IPerson } from '../interfaces/person.interface'
 import {
-  CommunicationMethod,
-  Gender,
-  PersonRole,
-  Subscription,
+  ECommunicationMethod,
+  EGender,
+  EPersonRole,
+  ESubscription,
   TCommunicationMethod,
   TGender,
   TSubscription,
@@ -19,7 +19,7 @@ export class Person implements Omit<IPerson, '_id'> {
   @Prop({ type: [String], default: [] })
   addressIds: string[]
 
-  @Prop({ default: CommunicationMethod.PHONE })
+  @Prop({ default: ECommunicationMethod.PHONE })
   communicationMethod: TCommunicationMethod
 
   @Prop({ default: new Date().toISOString() })
@@ -34,7 +34,7 @@ export class Person implements Omit<IPerson, '_id'> {
   @Prop({ required: true })
   firstName: string
 
-  @Prop({ default: Gender.NONE })
+  @Prop({ default: EGender.NONE })
   gender: TGender
 
   @Prop({ default: '' })
@@ -52,10 +52,10 @@ export class Person implements Omit<IPerson, '_id'> {
   @Prop({ required: true })
   phone: string
 
-  @Prop({ default: PersonRole.LID })
-  role: PersonRole
+  @Prop({ default: EPersonRole.LID })
+  role: EPersonRole
 
-  @Prop({ default: Subscription.NONE })
+  @Prop({ default: ESubscription.NONE })
   subscription: TSubscription
 
   @Prop({ default: '' })
