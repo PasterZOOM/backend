@@ -6,10 +6,10 @@ export interface IAddress {
   city: string
   country: string
   created: string
-  personId: string
   deliveryPlace: TDeliveryPlace
   house: string
   index: string
+  ownerId: string
   region: string
   street: string
   transportCompany: TDeliveryMethod

@@ -21,15 +21,15 @@ export class OrdersService {
     return this.OrderModel.find().sort().exec()
   }
 
-  async findOne(id: number): Promise<IOrder> {
+  async findOne(id: string): Promise<IOrder> {
     return this.OrderModel.findById(id)
   }
 
-  async update(id: number, updateOrderDto: UpdateOrderDto): Promise<IOrder> {
+  async update(id: string, updateOrderDto: UpdateOrderDto): Promise<IOrder> {
     return this.OrderModel.findByIdAndUpdate(id, updateOrderDto)
   }
 
-  async remove(id: number): Promise<IOrder> {
+  async remove(id: string): Promise<IOrder> {
     return this.OrderModel.findByIdAndRemove(id)
   }
 }

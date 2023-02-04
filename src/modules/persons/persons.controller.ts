@@ -4,8 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Patch,
   Post,
@@ -21,7 +19,6 @@ export class PersonsController {
   constructor(private readonly personsService: PersonsService) {}
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
   create(@Body() createPersonDto: CreatePersonDto): Promise<IPerson> {
     return this.personsService.create(createPersonDto)
   }

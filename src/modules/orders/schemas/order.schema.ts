@@ -15,25 +15,25 @@ export class Order implements Omit<IOrder, '_id'> {
   @Prop({ default: new Date().toISOString() })
   created: string
 
-  @Prop({ default: '' })
-  customerId: string
-
-  @Prop({ default: '' })
+  @Prop({ type: Object })
   date: IOrderDate
 
+  @Prop({ type: Object })
   deliveryData: IDeliveryOrderData
-
-  @Prop({ default: '' })
-  id: string
 
   @Prop({ default: 0 })
   number: number
 
+  @Prop({ default: '' })
+  ownerId: string
+
+  @Prop({ type: Object })
   products: any // TODO: написать 'ProductType[]'
 
   @Prop({ default: EOrderStatus.REGISTERED })
   status: TOrderStatus
 
+  @Prop({ type: Object })
   sum: ICost
 }
 

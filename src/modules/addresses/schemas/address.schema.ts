@@ -25,9 +25,6 @@ export class Address implements Omit<IAddress, '_id'> {
   @Prop({ default: new Date().toISOString() })
   created: string
 
-  @Prop({ default: '' })
-  personId: string
-
   @Prop({ default: EDeliveryPlace.ADDRESS })
   deliveryPlace: TDeliveryPlace
 
@@ -36,6 +33,9 @@ export class Address implements Omit<IAddress, '_id'> {
 
   @Prop({ default: '' })
   index: string
+
+  @Prop({ default: '' })
+  ownerId: string
 
   @Prop({ default: '' })
   region: string

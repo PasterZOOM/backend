@@ -7,13 +7,13 @@ export class CreateAddressDto {
 
   readonly country: string
 
-  readonly personId: string
-
   readonly deliveryPlace: TDeliveryPlace
 
   readonly house: string
 
   readonly index: string
+
+  readonly ownerId: string
 
   readonly region: string
 

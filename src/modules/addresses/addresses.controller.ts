@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
 import { PersonsService } from '../persons/persons.service'
@@ -15,12 +25,15 @@ export class AddressesController {
     private readonly personsService: PersonsService
   ) {}
 
-  @Post()
-  async create(@Body() createAddressDto: CreateAddressDto): Promise<IAddress> {
+  @Post(':ownerId')
+  async create(
+    @Param('ownerId') ownerId: string,
+    @Body() createAddressDto: Omit<CreateAddressDto, 'ownerId'>
+  ): Promise<IAddress> {
     try {
-      const person = await this.personsService.findOne(createAddressDto.personId)
+      const person = await this.personsService.findOne(ownerId)
 
-      const createdAddress = await this.addressesService.create(createAddressDto)
+      const createdAddress = await this.addressesService.create({ ...createAddressDto, ownerId })
 
       await this.personsService.push(person._id, { addressIds: createdAddress._id })
 
@@ -52,7 +65,7 @@ export class AddressesController {
   async remove(@Param('id') id: string): Promise<IAddress> {
     try {
       const address = await this.findOne(id)
-      const owner = await this.personsService.findOne(address.personId)
+      const owner = await this.personsService.findOne(address.ownerId)
 
       if (owner) {
         await this.personsService.pull(owner._id, { addressIds: id })
@@ -65,6 +78,7 @@ export class AddressesController {
   }
 
   @Patch(':id/main')
+  @HttpCode(HttpStatus.ACCEPTED)
   async makeAddressMain(@Param('id') id: string): Promise<{ addressIds: string[] }> {
     return this.personsService.makeAddressMain(id)
   }

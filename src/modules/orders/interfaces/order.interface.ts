@@ -27,10 +27,10 @@ export interface IOrder {
   _id: string
   comment: string
   created: string
-  customerId: string
   date: IOrderDate
   deliveryData: IDeliveryOrderData
   number: number
+  ownerId: string
   products: any // TODO: написать 'ProductType[]'
   status: TOrderStatus
   sum: ICost
