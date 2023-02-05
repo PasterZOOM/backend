@@ -12,9 +12,6 @@ export class Order implements Omit<IOrder, '_id'> {
   @Prop({ default: '' })
   comment: string
 
-  @Prop({ default: new Date().toISOString() })
-  created: string
-
   @Prop({ type: Object })
   date: IOrderDate
 

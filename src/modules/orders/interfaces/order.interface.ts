@@ -5,12 +5,12 @@ import { IAddress } from '../../addresses/interfaces/address.interface'
 import { TOrderStatus, TPaymentFor } from './orders.type'
 
 export interface IOrderDate {
-  deadline: string
-  delivery: string
-  departure: string
-  finishProduction: string
-  registration: string
-  startProduction: string
+  deadline: Date
+  delivery: Date | null
+  departure: Date | null
+  finishProduction: Date | null
+  registration: Date
+  startProduction: Date | null
 }
 export interface ITracking {
   site: string
@@ -26,7 +26,6 @@ export interface IDeliveryOrderData {
 export interface IOrder {
   _id: string
   comment: string
-  created: string
   date: IOrderDate
   deliveryData: IDeliveryOrderData
   number: number

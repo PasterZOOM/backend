@@ -1,18 +1,18 @@
 export enum EOrderStatus {
-  CANCELED = 'canceled',
-  DELIVERED = 'delivered',
-  DELIVERY_WAITING = 'delivery waiting',
-  PAYMENT_WAITING = 'payment waiting',
-  PROCESSED = 'processed',
-  PRODUCED = 'produced',
-  QUEUE = 'queue',
-  READY = 'ready',
-  REGISTERED = 'registered',
-  SEND = 'send',
+  CANCELED = 'CANCELED',
+  DELIVERED = 'DELIVERED',
+  DELIVERY_WAITING = 'DELIVERY_WAITING',
+  PAYMENT_WAITING = 'PAYMENT_WAITING',
+  PROCESSED = 'PROCESSED',
+  PRODUCED = 'PRODUCED',
+  QUEUE = 'QUEUE',
+  READY = 'READY',
+  REGISTERED = 'REGISTERED',
+  SEND = 'SEND',
 }
 enum EPaymentFor {
-  RECIPIENT = 'recipient',
-  SENDER = 'sender',
+  RECIPIENT = 'RECIPIENT',
+  SENDER = 'SENDER',
 }
 
 export type TOrderStatus = keyof typeof EOrderStatus
