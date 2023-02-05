@@ -20,8 +20,6 @@ export class OrdersController {
   async create(
     @Param('ownerId') ownerId: string,
     @Query('deadline') deadline: string,
-    @Query('cost') cost: string,
-    @Query('currency') currency: string,
     @Body() createOrderDto: Omit<CreateOrderDto, 'ownerId' | 'number' | 'date'> // TODO: удалить сумму, она будет рассчитываться исходя из стоимпости заказаов
   ): Promise<IOrder> {
     try {

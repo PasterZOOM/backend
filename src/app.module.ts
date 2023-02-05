@@ -4,8 +4,11 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AddressesModule } from './modules/addresses/addresses.module'
+import { LeathersModule } from './modules/materials/leathers/leathers.module'
+import { ThreadsModule } from './modules/materials/threads/threads.module'
 import { OrdersModule } from './modules/orders/orders.module'
 import { PersonsModule } from './modules/persons/persons.module'
+import { ProductsModule } from './modules/products/products.module'
 
 @Module({
   imports: [
@@ -13,6 +16,9 @@ import { PersonsModule } from './modules/persons/persons.module'
     PersonsModule,
     AddressesModule,
     OrdersModule,
+    ProductsModule,
+    ThreadsModule,
+    LeathersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
