@@ -1,23 +1,16 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
+import { PersonEntity } from '../persons/entities/person.entity'
 import { PersonsService } from '../persons/persons.service'
 
 import { AddressesService } from './addresses.service'
 import { CreateAddressDto } from './dto/create-address.dto'
 import { UpdateAddressDto } from './dto/update-address.dto'
-import { IAddress } from './interfaces/address.interface'
+import { AddressEntity } from './entities/address.entity'
 
+@ApiTags('Addresses')
 @Controller('addresses')
 export class AddressesController {
   constructor(
@@ -28,8 +21,8 @@ export class AddressesController {
   @Post(':ownerId')
   async create(
     @Param('ownerId') ownerId: string,
-    @Body() createAddressDto: Omit<CreateAddressDto, 'ownerId'>
-  ): Promise<IAddress> {
+    @Body() createAddressDto: CreateAddressDto
+  ): Promise<AddressEntity> {
     try {
       const person = await this.personsService.findOne(ownerId)
 
@@ -44,12 +37,12 @@ export class AddressesController {
   }
 
   @Get()
-  findAll(): Promise<IAddress[]> {
+  findAll(): Promise<AddressEntity[]> {
     return this.addressesService.findAll()
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<IAddress> {
+  async findOne(@Param('id') id: string): Promise<AddressEntity> {
     return this.addressesService.findOne(id)
   }
 
@@ -57,12 +50,20 @@ export class AddressesController {
   async update(
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto
-  ): Promise<IAddress> {
-    return this.addressesService.update(id, updateAddressDto)
+  ): Promise<AddressEntity> {
+    await this.addressesService.update(id, updateAddressDto)
+
+    return this.findOne(id)
+  }
+
+  @Patch(':id/main')
+  @ApiOkResponse({ type: PickType(PersonEntity, ['addressIds']) })
+  async makeAddressMain(@Param('id') id: string): Promise<{ addressIds: string[] }> {
+    return this.personsService.makeAddressMain(id)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<IAddress> {
+  async remove(@Param('id') id: string): Promise<AddressEntity> {
     try {
       const address = await this.findOne(id)
       const owner = await this.personsService.findOne(address.ownerId)
@@ -75,11 +76,5 @@ export class AddressesController {
     } catch (e) {
       throw new BadIdException('address', e)
     }
-  }
-
-  @Patch(':id/main')
-  @HttpCode(HttpStatus.ACCEPTED)
-  async makeAddressMain(@Param('id') id: string): Promise<{ addressIds: string[] }> {
-    return this.personsService.makeAddressMain(id)
   }
 }

@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
-import { LeatherArticlesService } from 'src/modules/materials/leathers/modules/leather-articles/leather-articles.service'
+
+import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 
 import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { UpdateLeatherColorDto } from './dto/update-leather-color.dto'
-import { ILeatherColor } from './interfaces/leather-color.interface'
+import { LeatherColorEntity } from './entities/leather-color.entity'
 import { LeatherColorsService } from './leather-colors.service'
 
+@ApiTags('Leather-colors')
 @Controller('leather-colors')
 export class LeatherColorsController {
   constructor(
@@ -16,9 +19,9 @@ export class LeatherColorsController {
 
   @Post(':articleId')
   async create(
-    @Body() createLeatherColorDto: Omit<CreateLeatherColorDto, 'article'>,
+    @Body() createLeatherColorDto: CreateLeatherColorDto,
     @Param('articleId') articleId: string
-  ): Promise<ILeatherColor> {
+  ): Promise<LeatherColorEntity> {
     try {
       const article = await this.leatherArticlesService.findOne(articleId)
 
@@ -36,12 +39,12 @@ export class LeatherColorsController {
   }
 
   @Get()
-  async findAll(): Promise<ILeatherColor[]> {
+  async findAll(): Promise<LeatherColorEntity[]> {
     return this.leatherColorsService.findAll()
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ILeatherColor> {
+  async findOne(@Param('id') id: string): Promise<LeatherColorEntity> {
     return this.leatherColorsService.findOne(id)
   }
 
@@ -49,12 +52,14 @@ export class LeatherColorsController {
   async update(
     @Param('id') id: string,
     @Body() updateLeatherColorDto: UpdateLeatherColorDto
-  ): Promise<ILeatherColor> {
-    return this.leatherColorsService.update(id, updateLeatherColorDto)
+  ): Promise<LeatherColorEntity> {
+    await this.leatherColorsService.update(id, updateLeatherColorDto)
+
+    return this.findOne(id)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<ILeatherColor> {
+  async remove(@Param('id') id: string): Promise<LeatherColorEntity> {
     try {
       const color = await this.findOne(id)
       const article = await this.leatherArticlesService.findOne(color.article)

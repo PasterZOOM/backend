@@ -1,23 +1,5 @@
-import { TDeliveryMethod, TDeliveryPlace } from '../interfaces/addresses.type'
+import { OmitType } from '@nestjs/swagger'
 
-export class CreateAddressDto {
-  readonly apartment?: string
+import { AddressEntity } from '../entities/address.entity'
 
-  readonly city: string
-
-  readonly country: string
-
-  readonly deliveryPlace: TDeliveryPlace
-
-  readonly house: string
-
-  readonly index: string
-
-  readonly ownerId: string
-
-  readonly region: string
-
-  readonly street: string
-
-  readonly transportCompany: TDeliveryMethod
-}
+export class CreateAddressDto extends OmitType(AddressEntity, ['_id', 'created', 'ownerId']) {}

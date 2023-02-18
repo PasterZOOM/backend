@@ -4,51 +4,55 @@ import { FilterQuery, Model } from 'mongoose'
 
 import { CreateLeatherArticleDto } from './dto/create-leather-article.dto'
 import { UpdateLeatherArticleDto } from './dto/update-leather-article.dto'
-import { ILeatherArticle } from './interfaces/leather-article.interface'
-import { LeatherArticle, LeatherArticleDocument } from './schemas/leather-article.schema'
+import { LeatherArticleEntity } from './entities/leather-article.entity'
+import { LeatherArticleAlias, LeatherArticleDocument } from './schemas/leather-article.schema'
 
 @Injectable()
 export class LeatherArticlesService {
   constructor(
-    @InjectModel(LeatherArticle.name) private LeatherArticleModel: Model<LeatherArticleDocument>
+    @InjectModel(LeatherArticleAlias) private LeatherArticleModel: Model<LeatherArticleDocument>
   ) {}
 
-  async create(createLeatherArticleDto: CreateLeatherArticleDto): Promise<ILeatherArticle> {
+  async create(
+    createLeatherArticleDto: CreateLeatherArticleDto & { factory: string }
+  ): Promise<LeatherArticleEntity> {
     const newLeatherArticle = new this.LeatherArticleModel(createLeatherArticleDto)
 
     return newLeatherArticle.save()
   }
 
-  async findAll(filter: FilterQuery<ILeatherArticle>): Promise<ILeatherArticle[]> {
+  async findAll(filter: FilterQuery<LeatherArticleEntity>): Promise<LeatherArticleEntity[]> {
     return this.LeatherArticleModel.find(filter).exec()
   }
 
-  async findOne(id: string): Promise<ILeatherArticle> {
+  async findOne(id: string): Promise<LeatherArticleEntity> {
     return this.LeatherArticleModel.findById(id)
   }
 
   async update(
     id: string,
     updateLeatherArticleDto: UpdateLeatherArticleDto
-  ): Promise<ILeatherArticle> {
+  ): Promise<LeatherArticleEntity> {
     return this.LeatherArticleModel.findByIdAndUpdate(id, updateLeatherArticleDto)
   }
 
-  async remove(id: string): Promise<ILeatherArticle> {
+  async remove(id: string): Promise<LeatherArticleEntity> {
     return this.LeatherArticleModel.findByIdAndRemove(id)
   }
 
   async push(
     id: string,
-    addToSet: { [key in keyof Partial<Pick<ILeatherArticle, 'colors'>>]: string }
-  ): Promise<ILeatherArticle> {
-    return this.LeatherArticleModel.findByIdAndUpdate(id, { $addToSet: addToSet })
+    addToSet: { [key in keyof Partial<Pick<LeatherArticleEntity, 'colors'>>]: string }
+  ): Promise<LeatherArticleEntity> {
+    await this.LeatherArticleModel.findByIdAndUpdate(id, { $addToSet: addToSet })
+
+    return this.findOne(id)
   }
 
   async pull(
     id: string,
-    pulled: { [key in keyof Partial<Pick<ILeatherArticle, 'colors'>>]: string }
-  ): Promise<ILeatherArticle> {
+    pulled: { [key in keyof Partial<Pick<LeatherArticleEntity, 'colors'>>]: string }
+  ): Promise<LeatherArticleEntity> {
     return this.LeatherArticleModel.findByIdAndUpdate(id, { $pull: pulled })
   }
 }

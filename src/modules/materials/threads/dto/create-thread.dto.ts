@@ -1,13 +1,5 @@
-export class CreateThreadDto {
-  readonly color: string
+import { OmitType } from '@nestjs/swagger'
 
-  readonly colorCode: string
+import { ThreadEntity } from '../entities/thread.entity'
 
-  readonly manufacturer: string
-
-  readonly photo: string
-
-  readonly thickness: string
-
-  readonly thicknessCode: string
-}
+export class CreateThreadDto extends OmitType(ThreadEntity, ['_id']) {}

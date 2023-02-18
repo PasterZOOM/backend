@@ -4,46 +4,46 @@ import { Model } from 'mongoose'
 
 import { CreatePersonDto } from './dto/create-person.dto'
 import { UpdatePersonDto } from './dto/update-person.dto'
-import { IPerson } from './interfaces/person.interface'
-import { Person, PersonDocument } from './schemas/person.schema'
+import { PersonEntity } from './entities/person.entity'
+import { PersonAlias, PersonDocument } from './schemas/person.schema'
 
 @Injectable()
 export class PersonsService {
-  constructor(@InjectModel(Person.name) private PersonModel: Model<PersonDocument>) {}
+  constructor(@InjectModel(PersonAlias) private PersonModel: Model<PersonDocument>) {}
 
-  async create(createPersonDto: CreatePersonDto): Promise<IPerson> {
+  async create(createPersonDto: CreatePersonDto): Promise<PersonEntity> {
     const newPerson = new this.PersonModel(createPersonDto)
 
     return newPerson.save()
   }
 
-  async findAll(): Promise<IPerson[]> {
+  async findAll(): Promise<PersonEntity[]> {
     return this.PersonModel.find().sort().exec()
   }
 
-  async findOne(id: string): Promise<IPerson> {
+  async findOne(id: string): Promise<PersonEntity> {
     return this.PersonModel.findById(id)
   }
 
-  async update(id: string, updatePersonDto: UpdatePersonDto): Promise<IPerson> {
+  async update(id: string, updatePersonDto: UpdatePersonDto): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndUpdate(id, updatePersonDto)
   }
 
-  async remove(id: string): Promise<IPerson> {
+  async remove(id: string): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndRemove(id)
   }
 
   async push(
     id: string,
-    addToSet: { [key in keyof Partial<Pick<IPerson, 'addressIds' | 'orderIds'>>]: string }
-  ): Promise<IPerson> {
+    addToSet: { [key in keyof Partial<Pick<PersonEntity, 'addressIds' | 'orderIds'>>]: string }
+  ): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndUpdate(id, { $addToSet: addToSet })
   }
 
   async pull(
     id: string,
-    pulled: { [key in keyof Partial<Pick<IPerson, 'addressIds' | 'orderIds'>>]: string }
-  ): Promise<IPerson> {
+    pulled: { [key in keyof Partial<Pick<PersonEntity, 'addressIds' | 'orderIds'>>]: string }
+  ): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndUpdate(id, { $pull: pulled })
   }
 

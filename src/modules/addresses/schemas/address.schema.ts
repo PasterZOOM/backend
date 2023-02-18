@@ -1,18 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
-import { IAddress } from '../interfaces/address.interface'
+import { AddressEntity } from '../entities/address.entity'
 import {
   EDeliveryMethod,
   EDeliveryPlace,
   TDeliveryMethod,
   TDeliveryPlace,
-} from '../interfaces/addresses.type'
+} from '../entities/addresses.type'
 
 export type AddressDocument = Address & Document
 
 @Schema()
-export class Address implements Omit<IAddress, '_id'> {
+export class Address implements Omit<AddressEntity, '_id'> {
   @Prop({ default: '' })
   apartment: string
 
@@ -22,8 +22,8 @@ export class Address implements Omit<IAddress, '_id'> {
   @Prop({ default: '' })
   country: string
 
-  @Prop({ default: new Date().toISOString() })
-  created: string
+  @Prop({ default: new Date() })
+  created: Date
 
   @Prop({ default: EDeliveryPlace.ADDRESS })
   deliveryPlace: TDeliveryPlace
@@ -48,3 +48,5 @@ export class Address implements Omit<IAddress, '_id'> {
 }
 
 export const AddressSchema = SchemaFactory.createForClass(Address)
+
+export const AddressAlias = Address.name

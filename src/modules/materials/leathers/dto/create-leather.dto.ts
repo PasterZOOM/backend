@@ -1,13 +1,5 @@
-export class CreateLeatherDto {
-  readonly article: string
+import { OmitType } from '@nestjs/swagger'
 
-  readonly code: string
+import { LeatherEntity } from '../entities/leather.entity'
 
-  readonly color: string
-
-  readonly description: string
-
-  readonly factory: string
-
-  readonly thickness: number
-}
+export class CreateLeatherDto extends OmitType(LeatherEntity, ['_id']) {}

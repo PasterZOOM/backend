@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
-import { IThread } from '../interfaces/thread.interface'
+import { ThreadEntity } from '../entities/thread.entity'
 
 export type ThreadDocument = Thread & Document
 
 @Schema()
-export class Thread implements Omit<IThread, '_id'> {
+export class Thread implements Omit<ThreadEntity, '_id'> {
   @Prop({ default: '' })
   color: string
 
@@ -27,3 +27,5 @@ export class Thread implements Omit<IThread, '_id'> {
 }
 
 export const ThreadSchema = SchemaFactory.createForClass(Thread)
+
+export const ThreadAlias = Thread.name

@@ -1,6 +1,6 @@
 import { ICost } from 'src/common/interfaces/cost.interface'
 
-import { IAddress } from '../../addresses/interfaces/address.interface'
+import { AddressEntity } from '../../addresses/entities/address.entity'
 
 import { TOrderStatus, TPaymentFor } from './orders.type'
 
@@ -18,7 +18,7 @@ export interface ITracking {
 }
 export interface IDeliveryOrderData {
   cost: ICost
-  delivery: IAddress
+  delivery: AddressEntity
   paymentFor: TPaymentFor
   tracking: ITracking | null
 }

@@ -1,29 +1,19 @@
-import { TCommunicationMethod, TGender, TSubscription } from '../interfaces/persons.type'
+import { PickType } from '@nestjs/swagger'
 
-export class CreatePersonDto {
-  readonly communicationMethod: TCommunicationMethod
+import { PersonEntity } from '../entities/person.entity'
 
-  readonly email?: string
-
-  readonly firstName: string
-
-  readonly gender?: TGender
-
-  readonly instagram: string
-
-  readonly lastName: string
-
-  readonly patronymic?: string
-
-  readonly phone: string
-
-  readonly subscription?: TSubscription
-
-  readonly telegram?: string
-
-  readonly viber?: string
-
-  readonly vk?: string
-
-  readonly whatsApp?: string
-}
+export class CreatePersonDto extends PickType(PersonEntity, [
+  'communicationMethod',
+  'email',
+  'firstName',
+  'gender',
+  'instagram',
+  'lastName',
+  'patronymic',
+  'phone',
+  'subscription',
+  'telegram',
+  'viber',
+  'vk',
+  'whatsApp',
+]) {}

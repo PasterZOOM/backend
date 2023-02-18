@@ -3,15 +3,15 @@ import { ICost } from 'src/common/interfaces/cost.interface'
 import { IOrderDate } from '../interfaces/order.interface'
 
 export class CreateOrderDto {
-  readonly comment?: string
+  comment?: string
 
-  readonly date: Partial<IOrderDate>
+  date: Partial<IOrderDate>
 
-  readonly number: string
+  number: string
 
-  readonly ownerId: string
+  ownerId: string
 
-  readonly products: any // TODO: написать 'ProductType[]'
+  products: any // TODO: написать 'ProductType[]'
 
-  readonly sum: ICost
+  sum: ICost
 }

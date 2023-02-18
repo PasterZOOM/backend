@@ -2,12 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import { TCountry } from 'src/common/interfaces/country.type'
 
-import { ILeatherFactory } from '../interfaces/leather-factory.interface'
+import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
 
 export type LeatherFactoryDocument = LeatherFactory & Document
 
 @Schema()
-export class LeatherFactory implements Omit<ILeatherFactory, '_id'> {
+export class LeatherFactory implements Omit<LeatherFactoryEntity, '_id'> {
   @Prop({ type: [String], default: [] })
   articles: string[]
 
@@ -22,3 +22,5 @@ export class LeatherFactory implements Omit<ILeatherFactory, '_id'> {
 }
 
 export const LeatherFactorySchema = SchemaFactory.createForClass(LeatherFactory)
+
+export const LeatherFactoryAlias = LeatherFactory.name

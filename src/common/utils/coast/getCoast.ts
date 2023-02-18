@@ -1,6 +1,7 @@
 import { currencyApi } from 'src/api/currency/currencyApi'
-import { ICost } from 'src/common/interfaces/cost.interface'
-import { ECost, TCost } from 'src/common/interfaces/cost.type'
+
+import { ICost } from '../../interfaces/cost.interface'
+import { ECost, TCost } from '../../interfaces/cost.type'
 
 export const getCoast = async (cost: number, currency: ECost): Promise<ICost> => {
   let costInBYN: number = cost

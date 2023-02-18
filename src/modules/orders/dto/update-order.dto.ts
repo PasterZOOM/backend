@@ -1,18 +1,20 @@
-import { PartialType } from '@nestjs/mapped-types'
+import { ApiProperty, PartialType } from '@nestjs/swagger'
 import { ICost } from 'src/common/interfaces/cost.interface'
-import { IOrderDate, IDeliveryOrderData } from 'src/modules/orders/interfaces/order.interface'
-import { TOrderStatus } from 'src/modules/orders/interfaces/orders.type'
+
+import { IDeliveryOrderData, IOrderDate } from '../interfaces/order.interface'
+import { EOrderStatus, TOrderStatus } from '../interfaces/orders.type'
 
 import { CreateOrderDto } from './create-order.dto'
 
 export class UpdateOrderDto extends PartialType(CreateOrderDto) {
-  readonly date: Partial<IOrderDate>
+  date: Partial<IOrderDate>
 
-  readonly deliveryData: Partial<IDeliveryOrderData>
+  deliveryData: Partial<IDeliveryOrderData>
 
-  readonly products: any // TODO: написать 'ProductType[]'
+  products: any // TODO: написать 'ProductType[]'
 
-  readonly status: TOrderStatus
+  @ApiProperty({ enum: EOrderStatus, enumName: 'TOrderStatus' })
+  status: TOrderStatus
 
-  readonly sum: ICost
+  sum: ICost
 }

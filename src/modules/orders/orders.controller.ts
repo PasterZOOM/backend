@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { getOrderNumber } from 'src/common/utils/string/getOrderNumber'
 
@@ -9,6 +10,7 @@ import { UpdateOrderDto } from './dto/update-order.dto'
 import { IOrder, IOrderDate } from './interfaces/order.interface'
 import { OrdersService } from './orders.service'
 
+@ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(

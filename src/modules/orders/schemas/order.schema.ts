@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import { ICost } from 'src/common/interfaces/cost.interface'
-import { EOrderStatus, TOrderStatus } from 'src/modules/orders/interfaces/orders.type'
 
 import { IDeliveryOrderData, IOrder, IOrderDate } from '../interfaces/order.interface'
+import { EOrderStatus, TOrderStatus } from '../interfaces/orders.type'
 
 export type OrderDocument = Order & Document
 

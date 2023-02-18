@@ -4,32 +4,32 @@ import { Model } from 'mongoose'
 
 import { CreateLeatherDto } from './dto/create-leather.dto'
 import { UpdateLeatherDto } from './dto/update-leather.dto'
-import { ILeather } from './interfaces/leather.interface'
-import { Leather, LeatherDocument } from './schemas/leather.schema'
+import { LeatherEntity } from './entities/leather.entity'
+import { LeatherAlias, LeatherDocument } from './schemas/leather.schema'
 
 @Injectable()
 export class LeathersService {
-  constructor(@InjectModel(Leather.name) private LeatherModel: Model<LeatherDocument>) {}
+  constructor(@InjectModel(LeatherAlias) private LeatherModel: Model<LeatherDocument>) {}
 
-  async create(createLeatherDto: CreateLeatherDto): Promise<ILeather> {
+  async create(createLeatherDto: CreateLeatherDto): Promise<LeatherEntity> {
     const newThread = new this.LeatherModel(createLeatherDto)
 
     return newThread.save()
   }
 
-  async findAll(): Promise<ILeather[]> {
+  async findAll(): Promise<LeatherEntity[]> {
     return this.LeatherModel.find().exec()
   }
 
-  async findOne(id: string): Promise<ILeather> {
+  async findOne(id: string): Promise<LeatherEntity> {
     return this.LeatherModel.findById(id)
   }
 
-  async update(id: string, updateLeatherDto: UpdateLeatherDto): Promise<ILeather> {
+  async update(id: string, updateLeatherDto: UpdateLeatherDto): Promise<LeatherEntity> {
     return this.LeatherModel.findByIdAndUpdate(id, updateLeatherDto)
   }
 
-  async remove(id: string): Promise<ILeather> {
+  async remove(id: string): Promise<LeatherEntity> {
     return this.LeatherModel.findByIdAndRemove(id)
   }
 }

@@ -4,32 +4,32 @@ import { Model } from 'mongoose'
 
 import { CreateThreadDto } from './dto/create-thread.dto'
 import { UpdateThreadDto } from './dto/update-thread.dto'
-import { IThread } from './interfaces/thread.interface'
-import { Thread, ThreadDocument } from './schemas/thread.schema'
+import { ThreadEntity } from './entities/thread.entity'
+import { ThreadAlias, ThreadDocument } from './schemas/thread.schema'
 
 @Injectable()
 export class ThreadsService {
-  constructor(@InjectModel(Thread.name) private ThreadModel: Model<ThreadDocument>) {}
+  constructor(@InjectModel(ThreadAlias) private ThreadModel: Model<ThreadDocument>) {}
 
-  async create(createThreadDto: CreateThreadDto): Promise<IThread> {
+  async create(createThreadDto: CreateThreadDto): Promise<ThreadEntity> {
     const newThread = new this.ThreadModel(createThreadDto)
 
     return newThread.save()
   }
 
-  async findAll(): Promise<IThread[]> {
+  async findAll(): Promise<ThreadEntity[]> {
     return this.ThreadModel.find().exec()
   }
 
-  async findOne(id: string): Promise<IThread> {
+  async findOne(id: string): Promise<ThreadEntity> {
     return this.ThreadModel.findById(id)
   }
 
-  async update(id: string, updateThreadDto: UpdateThreadDto): Promise<IThread> {
+  async update(id: string, updateThreadDto: UpdateThreadDto): Promise<ThreadEntity> {
     return this.ThreadModel.findByIdAndUpdate(id, updateThreadDto)
   }
 
-  async remove(id: string): Promise<IThread> {
+  async remove(id: string): Promise<ThreadEntity> {
     return this.ThreadModel.findByIdAndRemove(id)
   }
 }

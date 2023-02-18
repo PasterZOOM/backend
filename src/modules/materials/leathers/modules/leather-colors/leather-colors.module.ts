@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { LeatherArticlesModule } from 'src/modules/materials/leathers/modules/leather-articles/leather-articles.module'
+
+import { LeatherArticlesModule } from '../leather-articles/leather-articles.module'
 
 import { LeatherColorsController } from './leather-colors.controller'
 import { LeatherColorsService } from './leather-colors.service'

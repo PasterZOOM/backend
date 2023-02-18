@@ -1,9 +1,5 @@
-import { TCountry } from 'src/common/interfaces/country.type'
+import { OmitType } from '@nestjs/swagger'
 
-export class CreateLeatherFactoryDto {
-  readonly country: TCountry
+import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
 
-  readonly description: string
-
-  readonly name: string
-}
+export class CreateLeatherFactoryDto extends OmitType(LeatherFactoryEntity, ['_id', 'articles']) {}

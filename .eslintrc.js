@@ -4,13 +4,17 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin', 'import', '@typescript-eslint', 'prettier'],
+  plugins: [
+    '@typescript-eslint/eslint-plugin',
+    'import',
+    '@typescript-eslint',
+    'prettier',
+    // 'sonarjs',
+  ],
   extends: [
     'airbnb',
-    'plugin:react/recommended',
+    // 'plugin:sonarjs/recommended',
     'plugin:import/recommended',
-    'plugin:prettier/recommended',
-    'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
@@ -27,24 +31,15 @@ module.exports = {
   },
   rules: {
     'default-param-last': 'off',
-
     'import/order': [
       'error',
       {
         'newlines-between': 'always',
-        pathGroupsExcludedImportTypes: ['react'],
         alphabetize: {
           order: 'asc',
           caseInsensitive: true,
         },
         groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
-        pathGroups: [
-          {
-            pattern: 'react',
-            group: 'external',
-            position: 'before',
-          },
-        ],
       },
     ],
     'import/no-unresolved': 'off',

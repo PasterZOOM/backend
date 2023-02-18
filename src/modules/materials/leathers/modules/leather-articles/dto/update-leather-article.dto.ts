@@ -1,7 +1,9 @@
-import { OmitType, PartialType } from '@nestjs/mapped-types'
+import { IntersectionType, PartialType, PickType } from '@nestjs/swagger'
+
+import { LeatherArticleEntity } from '../entities/leather-article.entity'
 
 import { CreateLeatherArticleDto } from './create-leather-article.dto'
 
 export class UpdateLeatherArticleDto extends PartialType(
-  OmitType(CreateLeatherArticleDto, ['factory'])
+  IntersectionType(CreateLeatherArticleDto, PickType(LeatherArticleEntity, ['factory']))
 ) {}

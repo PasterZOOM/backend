@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
-import { IPerson } from '../interfaces/person.interface'
+import { PersonEntity } from '../entities/person.entity'
 import {
   ECommunicationMethod,
   EGender,
@@ -10,12 +10,12 @@ import {
   TCommunicationMethod,
   TGender,
   TSubscription,
-} from '../interfaces/persons.type'
+} from '../entities/persons.type'
 
 export type PersonDocument = Person & Document
 
 @Schema()
-export class Person implements Omit<IPerson, '_id'> {
+export class Person implements Omit<PersonEntity, '_id'> {
   @Prop({ type: [String], default: [] })
   addressIds: string[]
 
@@ -72,3 +72,5 @@ export class Person implements Omit<IPerson, '_id'> {
 }
 
 export const PersonSchema = SchemaFactory.createForClass(Person)
+
+export const PersonAlias = Person.name

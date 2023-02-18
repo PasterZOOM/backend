@@ -6,11 +6,11 @@ import { LeathersService } from './leathers.service'
 import { LeatherArticlesModule } from './modules/leather-articles/leather-articles.module'
 import { LeatherColorsModule } from './modules/leather-colors/leather-colors.module'
 import { LeatherFactoriesModule } from './modules/leather-factories/leather-factories.module'
-import { Leather, LeatherSchema } from './schemas/leather.schema'
+import { LeatherAlias, LeatherSchema } from './schemas/leather.schema'
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Leather.name, schema: LeatherSchema }]),
+    MongooseModule.forFeature([{ name: LeatherAlias, schema: LeatherSchema }]),
     LeatherFactoriesModule,
     LeatherArticlesModule,
     LeatherColorsModule,
