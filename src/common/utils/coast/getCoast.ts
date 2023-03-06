@@ -1,9 +1,9 @@
 import { currencyApi } from 'src/api/currency/currencyApi'
+import { CostEntity } from 'src/common/interfaces/cost.entity'
 
-import { ICost } from '../../interfaces/cost.interface'
 import { ECost, TCost } from '../../interfaces/cost.type'
 
-export const getCoast = async (cost: number, currency: ECost): Promise<ICost> => {
+export const getCoast = async (cost: number, currency: ECost): Promise<CostEntity> => {
   let costInBYN: number = cost
 
   if (currency !== ECost.BYN) {
@@ -12,7 +12,7 @@ export const getCoast = async (cost: number, currency: ECost): Promise<ICost> =>
     costInBYN = (cost * rateCurrentCurrency.Cur_OfficialRate) / rateCurrentCurrency.Cur_Scale
   }
 
-  const allCosts = { BYN: Math.ceil(costInBYN) } as ICost
+  const allCosts = { BYN: Math.ceil(costInBYN) } as CostEntity
 
   await Promise.all(
     Object.keys(ECost)

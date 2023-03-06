@@ -53,9 +53,7 @@ export class LeatherColorsController {
     @Param('id') id: string,
     @Body() updateLeatherColorDto: UpdateLeatherColorDto
   ): Promise<LeatherColorEntity> {
-    await this.leatherColorsService.update(id, updateLeatherColorDto)
-
-    return this.findOne(id)
+    return this.leatherColorsService.update(id, updateLeatherColorDto)
   }
 
   @Delete(':id')

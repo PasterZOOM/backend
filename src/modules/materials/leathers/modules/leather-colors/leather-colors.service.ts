@@ -33,7 +33,9 @@ export class LeatherColorsService {
     id: string,
     updateLeatherColorDto: UpdateLeatherColorDto
   ): Promise<LeatherColorEntity> {
-    return this.LeatherColorsModel.findByIdAndUpdate(id, updateLeatherColorDto)
+    await this.LeatherColorsModel.findByIdAndUpdate(id, updateLeatherColorDto)
+
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<LeatherColorEntity> {

@@ -51,9 +51,7 @@ export class AddressesController {
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto
   ): Promise<AddressEntity> {
-    await this.addressesService.update(id, updateAddressDto)
-
-    return this.findOne(id)
+    return this.addressesService.update(id, updateAddressDto)
   }
 
   @Patch(':id/main')

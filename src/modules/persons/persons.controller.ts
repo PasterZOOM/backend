@@ -31,9 +31,7 @@ export class PersonsController {
     @Param('id') id: string,
     @Body() updatePersonDto: UpdatePersonDto
   ): Promise<PersonEntity> {
-    await this.personsService.update(id, updatePersonDto)
-
-    return this.findOne(id)
+    return this.personsService.update(id, updatePersonDto)
   }
 
   @Delete(':id')

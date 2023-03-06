@@ -30,7 +30,9 @@ export class PersonsService {
   }
 
   async remove(id: string): Promise<PersonEntity> {
-    return this.PersonModel.findByIdAndRemove(id)
+    await this.PersonModel.findByIdAndRemove(id)
+
+    return this.findOne(id)
   }
 
   async push(

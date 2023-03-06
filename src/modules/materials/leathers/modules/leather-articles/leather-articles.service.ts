@@ -33,7 +33,9 @@ export class LeatherArticlesService {
     id: string,
     updateLeatherArticleDto: UpdateLeatherArticleDto
   ): Promise<LeatherArticleEntity> {
-    return this.LeatherArticleModel.findByIdAndUpdate(id, updateLeatherArticleDto)
+    await this.LeatherArticleModel.findByIdAndUpdate(id, updateLeatherArticleDto)
+
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<LeatherArticleEntity> {

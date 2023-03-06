@@ -1,20 +1,12 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger'
-import { ICost } from 'src/common/interfaces/cost.interface'
+import { IntersectionType, PartialType, PickType } from '@nestjs/swagger'
 
-import { IDeliveryOrderData, IOrderDate } from '../interfaces/order.interface'
-import { EOrderStatus, TOrderStatus } from '../interfaces/orders.type'
+import { OrderEntity } from '../entities/order.entity'
 
 import { CreateOrderDto } from './create-order.dto'
 
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {
-  date: Partial<IOrderDate>
-
-  deliveryData: Partial<IDeliveryOrderData>
-
-  products: any // TODO: написать 'ProductType[]'
-
-  @ApiProperty({ enum: EOrderStatus, enumName: 'TOrderStatus' })
-  status: TOrderStatus
-
-  sum: ICost
-}
+export class UpdateOrderDto extends PartialType(
+  IntersectionType(
+    CreateOrderDto,
+    PickType(OrderEntity, ['date', 'deliveryData', 'products', 'status', 'sum'])
+  )
+) {}

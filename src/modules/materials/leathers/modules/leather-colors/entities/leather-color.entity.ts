@@ -16,6 +16,9 @@ export class LeatherColorEntity {
   })
   code: string
 
+  @ApiProperty({ type: String, description: 'фото цвета кожи' })
+  photo: string
+
   @ApiProperty({
     type: String,
     description: 'название цвета',

@@ -1,27 +1,37 @@
 import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
+import { ProductEntity } from './entities/product.entity'
+import { ProductAlias, ProductDocument } from './schemas/product.schema'
 
 @Injectable()
 export class ProductsService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product'
+  constructor(@InjectModel(ProductAlias) private ProductModel: Model<ProductDocument>) {}
+
+  async create(createProductDto: CreateProductDto): Promise<ProductEntity> {
+    const newPerson = new this.ProductModel(createProductDto)
+
+    return newPerson.save()
   }
 
-  findAll() {
-    return `This action returns all products`
+  async findAll(): Promise<ProductEntity[]> {
+    return this.ProductModel.find().sort().exec()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`
+  async findOne(id: string): Promise<ProductEntity> {
+    return this.ProductModel.findById(id)
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`
+  async update(id: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
+    await this.ProductModel.findByIdAndUpdate(id, updateProductDto)
+
+    return this.findOne(id)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`
+  async remove(id: string): Promise<ProductEntity> {
+    return this.ProductModel.findByIdAndRemove(id)
   }
 }

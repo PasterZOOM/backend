@@ -9,11 +9,11 @@ module.exports = {
     'import',
     '@typescript-eslint',
     'prettier',
-    // 'sonarjs',
+    'sonarjs',
   ],
   extends: [
     'airbnb',
-    // 'plugin:sonarjs/recommended',
+    'plugin:sonarjs/recommended',
     'plugin:import/recommended',
     'plugin:prettier/recommended',
     'plugin:@typescript-eslint/recommended',

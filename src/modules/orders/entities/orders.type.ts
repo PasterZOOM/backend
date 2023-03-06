@@ -10,7 +10,7 @@ export enum EOrderStatus {
   REGISTERED = 'REGISTERED',
   SEND = 'SEND',
 }
-enum EPaymentFor {
+export enum EPaymentFor {
   RECIPIENT = 'RECIPIENT',
   SENDER = 'SENDER',
 }

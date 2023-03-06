@@ -26,7 +26,9 @@ export class LeathersService {
   }
 
   async update(id: string, updateLeatherDto: UpdateLeatherDto): Promise<LeatherEntity> {
-    return this.LeatherModel.findByIdAndUpdate(id, updateLeatherDto)
+    await this.LeatherModel.findByIdAndUpdate(id, updateLeatherDto)
+
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<LeatherEntity> {

@@ -7,7 +7,8 @@ import { PersonsService } from '../persons/persons.service'
 
 import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderDto } from './dto/update-order.dto'
-import { IOrder, IOrderDate } from './interfaces/order.interface'
+import { OrderEntity } from './entities/order.entity'
+import { OrderDateEntity } from './entities/orderDate.entity'
 import { OrdersService } from './orders.service'
 
 @ApiTags('Orders')
@@ -22,16 +23,16 @@ export class OrdersController {
   async create(
     @Param('ownerId') ownerId: string,
     @Query('deadline') deadline: string,
-    @Body() createOrderDto: Omit<CreateOrderDto, 'ownerId' | 'number' | 'date'> // TODO: удалить сумму, она будет рассчитываться исходя из стоимпости заказаов
-  ): Promise<IOrder> {
+    @Body() createOrderDto: Omit<CreateOrderDto, 'ownerId' | 'number' | 'date'> // TODO: удалить сумму, она будет рассчитываться исходя из стоимпости изделий
+  ): Promise<OrderEntity> {
     try {
       const person = await this.personsService.findOne(ownerId)
 
       const number = getOrderNumber()
 
-      const date: IOrderDate = {
+      const date: OrderDateEntity = {
         registration: new Date(),
-        deadline: new Date(Date.now() + +deadline),
+        deadline: new Date(Date.now() + Number(deadline)),
         delivery: null,
         departure: null,
         finishProduction: null,
@@ -54,22 +55,22 @@ export class OrdersController {
   }
 
   @Get()
-  async findAll(): Promise<IOrder[]> {
+  async findAll(): Promise<OrderEntity[]> {
     return this.ordersService.findAll()
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<IOrder> {
+  findOne(@Param('id') id: string): Promise<OrderEntity> {
     return this.ordersService.findOne(id)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto): Promise<IOrder> {
+  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto): Promise<OrderEntity> {
     return this.ordersService.update(id, updateOrderDto)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<IOrder> {
+  async remove(@Param('id') id: string): Promise<OrderEntity> {
     try {
       const order = await this.findOne(id)
       const owner = await this.personsService.findOne(order.ownerId)

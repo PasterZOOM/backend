@@ -26,7 +26,9 @@ export class AddressesService {
   }
 
   async update(id: string, updateAddressDto: UpdateAddressDto): Promise<AddressEntity> {
-    return this.AddressModel.findByIdAndUpdate(id, updateAddressDto)
+    this.AddressModel.findByIdAndUpdate(id, updateAddressDto)
+
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<AddressEntity> {

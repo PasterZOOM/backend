@@ -1,17 +1,5 @@
-import { ICost } from 'src/common/interfaces/cost.interface'
+import { PickType } from '@nestjs/swagger'
 
-import { IOrderDate } from '../interfaces/order.interface'
+import { OrderEntity } from '../entities/order.entity'
 
-export class CreateOrderDto {
-  comment?: string
-
-  date: Partial<IOrderDate>
-
-  number: string
-
-  ownerId: string
-
-  products: any // TODO: написать 'ProductType[]'
-
-  sum: ICost
-}
+export class CreateOrderDto extends PickType(OrderEntity, ['ownerId', 'number', 'date']) {}

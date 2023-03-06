@@ -31,9 +31,7 @@ export class ThreadsController {
     @Param('id') id: string,
     @Body() updateThreadDto: UpdateThreadDto
   ): Promise<ThreadEntity> {
-    await this.threadService.update(id, updateThreadDto)
-
-    return this.findOne(id)
+    return this.threadService.update(id, updateThreadDto)
   }
 
   @Delete(':id')

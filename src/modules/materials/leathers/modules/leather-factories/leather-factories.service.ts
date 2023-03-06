@@ -31,7 +31,9 @@ export class LeatherFactoriesService {
     id: string,
     updateLeatherFactoryDto: UpdateLeatherFactoryDto
   ): Promise<LeatherFactoryEntity> {
-    return this.LeatherFactoryModel.findByIdAndUpdate(id, updateLeatherFactoryDto)
+    await this.LeatherFactoryModel.findByIdAndUpdate(id, updateLeatherFactoryDto)
+
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<LeatherFactoryEntity> {

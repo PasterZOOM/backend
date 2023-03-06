@@ -26,7 +26,9 @@ export class ThreadsService {
   }
 
   async update(id: string, updateThreadDto: UpdateThreadDto): Promise<ThreadEntity> {
-    return this.ThreadModel.findByIdAndUpdate(id, updateThreadDto)
+    await this.ThreadModel.findByIdAndUpdate(id, updateThreadDto)
+
+    return this.findOne(id)
   }
 
   async remove(id: string): Promise<ThreadEntity> {

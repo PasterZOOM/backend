@@ -28,6 +28,4 @@ async function bootstrap(): Promise<void> {
   await app.listen(port)
 }
 
-bootstrap()
-  .then(() => null)
-  .catch(() => null)
+bootstrap().then()

@@ -14,6 +14,9 @@ export class LeatherColor implements Omit<LeatherColorEntity, '_id'> {
   code: string
 
   @Prop({ default: '' })
+  photo: string
+
+  @Prop({ default: '' })
   name: string
 
   @Prop({ default: '' })
