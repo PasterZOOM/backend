@@ -1,22 +1,22 @@
-export enum EProductCategory {
-  FOR_CLOTH = 'FOR_CLOTH',
-  FOR_CARDS = 'FOR_CARDS',
-  FOR_CASH = 'FOR_CASH',
-  FOR_COINS = 'FOR_COINS',
-  FOR_DOCUMENTS = 'FOR_DOCUMENTS',
-  FOR_WATCH = 'FOR_WATCH',
-  FOR_AIRPODS = 'FOR_AIRPODS',
+export enum EProductAssignment {
+  FOR_CLOTH = 'for_cloth',
+  FOR_CARDS = 'for_cards',
+  FOR_CASH = 'for_cash',
+  FOR_COINS = 'for_coins',
+  FOR_DOCUMENTS = 'for_documents',
+  FOR_WATCH = 'for_watch',
+  FOR_AIRPODS = 'for_airpods',
 }
-export enum EProductType {
-  AUTODOC_HOLDER = 'AUTODOC_HOLDER',
-  BELT = 'BELT',
-  BIFOLD_WALLET = 'BIFOLD_WALLET',
-  CARD_HOLDER = 'CARD_HOLDER',
-  DOC_HOLDER = 'DOC_HOLDER',
-  PASSPORT_COVER = 'PASSPORT_COVER',
-  PURSE = 'PURSE',
-  WATCH_STRAP = 'WATCH_STRAP',
+export enum EProductCategory {
+  AUTODOC_HOLDER = 'autodoc_holder',
+  BELT = 'belt',
+  BIFOLD_WALLET = 'bifold_wallet',
+  CARD_HOLDER = 'card_holder',
+  DOC_HOLDER = 'doc_holder',
+  PASSPORT_COVER = 'passport_cover',
+  PURSE = 'purse',
+  WATCH_STRAP = 'watch_strap',
 }
 
+export type TProductAssignment = keyof typeof EProductAssignment
 export type TProductCategory = keyof typeof EProductCategory
-export type TProductType = keyof typeof EProductType

@@ -4,14 +4,14 @@ import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 import { ProductEntity } from '../entities/product.entity'
-import { EProductType, TProductCategory, TProductType } from '../entities/product.type'
+import { EProductCategory, TProductAssignment, TProductCategory } from '../entities/product.type'
 
 export type ProductDocument = Product & Document
 
 @Schema()
 export class Product implements Omit<ProductEntity, '_id'> {
   @Prop({ type: [String] })
-  category: TProductCategory[]
+  category: TProductAssignment[]
 
   @Prop({ default: '' })
   comment: string
@@ -43,8 +43,8 @@ export class Product implements Omit<ProductEntity, '_id'> {
   @Prop({ default: '' })
   title: string
 
-  @Prop({ default: EProductType.WATCH_STRAP })
-  type: TProductType
+  @Prop({ default: EProductCategory.WATCH_STRAP })
+  type: TProductCategory
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product)

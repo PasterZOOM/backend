@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 
 import { AddressesModule } from './modules/addresses/addresses.module'
+import { BasicProductsModule } from './modules/basic-products/basic-products.module'
 import { LeathersModule } from './modules/materials/leathers/leathers.module'
 import { ThreadsModule } from './modules/materials/threads/threads.module'
 import { OrdersModule } from './modules/orders/orders.module'
@@ -17,6 +18,7 @@ import { ProductsModule } from './modules/products/products.module'
     ProductsModule,
     ThreadsModule,
     LeathersModule,
+    BasicProductsModule,
   ],
 })
 export class AppModule {}

@@ -3,7 +3,7 @@ import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 
-import { EProductType, TProductCategory, TProductType } from './product.type'
+import { EProductCategory, TProductAssignment, TProductCategory } from './product.type'
 
 export class ProductEntity {
   @ApiProperty({ type: String, description: 'идентификационный номер изделия' })
@@ -13,7 +13,7 @@ export class ProductEntity {
     type: [String],
     description: 'к каким категориям относится изделие',
   })
-  category?: TProductCategory[] = []
+  category?: TProductAssignment[] = []
 
   @ApiProperty({ type: String, description: 'комментарий к изделию' })
   comment?: string = ''
@@ -56,10 +56,7 @@ export class ProductEntity {
   })
   punchPitch: TPunchPitch
 
-  @ApiProperty({
-    type: String,
-    description: 'размер изделия',
-  })
+  @ApiProperty({ type: String, description: 'размер изделия' })
   size: string
 
   @ApiProperty({
@@ -72,9 +69,9 @@ export class ProductEntity {
   title: string
 
   @ApiProperty({
-    enum: EProductType,
+    enum: EProductCategory,
     enumName: 'EProductType',
     description: 'тип изделия',
   })
-  type: TProductType
+  type: TProductCategory
 }
