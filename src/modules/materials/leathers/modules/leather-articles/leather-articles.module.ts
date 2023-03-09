@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 
+import { LeatherColorsModule } from '../leather-colors/leather-colors.module'
 import { LeatherFactoriesModule } from '../leather-factories/leather-factories.module'
 
 import { LeatherArticlesController } from './leather-articles.controller'
@@ -10,6 +11,7 @@ import { LeatherArticleAlias, LeatherArticleSchema } from './schemas/leather-art
 @Module({
   imports: [
     LeatherFactoriesModule,
+    forwardRef(() => LeatherColorsModule),
     MongooseModule.forFeature([{ name: LeatherArticleAlias, schema: LeatherArticleSchema }]),
   ],
   controllers: [LeatherArticlesController],

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { FilterQuery, Model } from 'mongoose'
 
 import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { UpdateLeatherColorDto } from './dto/update-leather-color.dto'
@@ -21,8 +21,8 @@ export class LeatherColorsService {
     return newLeatherColor.save()
   }
 
-  async findAll(): Promise<LeatherColorEntity[]> {
-    return this.LeatherColorsModel.find().sort().exec()
+  async findAll(filter?: FilterQuery<LeatherColorDocument>): Promise<LeatherColorEntity[]> {
+    return this.LeatherColorsModel.find(filter).sort().exec()
   }
 
   async findOne(id: string): Promise<LeatherColorEntity> {

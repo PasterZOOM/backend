@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+import { ELeatherColor } from './leather-colors.type'
+
 export class LeatherColorEntity {
   @ApiProperty({ type: String, description: 'идентификационный номер цвета кожи' })
   _id: string
@@ -23,7 +25,14 @@ export class LeatherColorEntity {
     type: String,
     description: 'название цвета',
   })
-  name: string
+  title: string
+
+  @ApiProperty({
+    enum: ELeatherColor,
+    enumName: 'ELeatherColor',
+    description: 'к какой категории чветов относится цвет',
+  })
+  value: string
 
   @ApiProperty({ type: String, description: 'описание цвета' })
   description: string

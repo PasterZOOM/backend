@@ -1,8 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  forwardRef,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FilterQuery } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
+import { LeatherColorsService } from '../leather-colors/leather-colors.service'
 import { LeatherFactoriesService } from '../leather-factories/leather-factories.service'
 
 import { CreateLeatherArticleDto } from './dto/create-leather-article.dto'
@@ -14,6 +25,8 @@ import { LeatherArticlesService } from './leather-articles.service'
 @Controller('leather-articles')
 export class LeatherArticlesController {
   constructor(
+    @Inject(forwardRef(() => LeatherColorsService))
+    private readonly leatherColorService: LeatherColorsService,
     private readonly leatherArticlesService: LeatherArticlesService,
     private readonly leatherFactoriesService: LeatherFactoriesService
   ) {}
@@ -66,6 +79,7 @@ export class LeatherArticlesController {
       if (factory) {
         await this.leatherFactoriesService.pull(factory._id, { articles: id })
       }
+      await Promise.all(article.colors.map(color => this.leatherColorService.remove(color)))
 
       return this.leatherArticlesService.remove(id)
     } catch (e) {
