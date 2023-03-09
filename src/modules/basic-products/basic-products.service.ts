@@ -5,6 +5,7 @@ import { Model } from 'mongoose'
 import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
 import { BasicProductEntity } from './entities/basic-product.entity'
+import { EFilterKeys } from './entities/basic-product.type'
 import { BasicProductAlias, BasicProductDocument } from './schemas/basic-product.schema'
 
 @Injectable()
@@ -19,8 +20,25 @@ export class BasicProductsService {
     return newPerson.save()
   }
 
-  async findAll(): Promise<BasicProductEntity[]> {
-    return this.BasicProductModel.find().sort().exec()
+  async findAll(
+    filters: Partial<Record<EFilterKeys, string[] | undefined>>
+  ): Promise<BasicProductEntity[]> {
+    let categories = []
+    let leathers = []
+
+    if (filters.categories) {
+      categories = filters.categories.map(category => ({ category }))
+    }
+    if (filters.leathers) {
+      leathers = filters.leathers.map(leather => ({ leather }))
+    }
+
+    return this.BasicProductModel.find({
+      $and: [
+        categories.length ? { $or: categories } : {},
+        leathers.length ? { $or: leathers } : {},
+      ],
+    })
   }
 
   async findOne(id: string): Promise<BasicProductEntity> {
