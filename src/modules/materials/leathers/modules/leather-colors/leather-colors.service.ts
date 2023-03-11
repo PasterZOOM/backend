@@ -29,6 +29,10 @@ export class LeatherColorsService {
     return this.LeatherColorsModel.findById(id)
   }
 
+  async findOneForArticle(id: string): Promise<Pick<LeatherColorEntity, '_id' | 'title'>> {
+    return this.LeatherColorsModel.findById(id, { _id: 1, title: 1 })
+  }
+
   async update(
     id: string,
     updateLeatherColorDto: UpdateLeatherColorDto

@@ -9,7 +9,8 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
+import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from 'src/modules/materials/leathers/modules/leather-articles/leather-articles.service'
 
 import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
@@ -32,13 +33,31 @@ export class LeatherFactoriesController {
   }
 
   @Get()
-  async findAll(): Promise<LeatherFactoryEntity[]> {
+  @ApiOkResponse({
+    type: [PickType(LeatherFactoryEntity, ['_id', 'name'])],
+  })
+  async findAll(): Promise<Pick<LeatherFactoryEntity, '_id' | 'name'>[]> {
     return this.leatherFactoriesService.findAll()
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<LeatherFactoryEntity> {
-    return this.leatherFactoriesService.findOne(id)
+  @Get(':id') // TODO написать возвращаемый тип для swagger
+  async findOne(@Param('id') id: string): Promise<
+    Omit<LeatherFactoryEntity, 'articles'> & {
+      articles: Pick<LeatherArticleEntity, '_id' | 'name'>[]
+    }
+  > {
+    const { articles, _id, description, country, name } =
+      await this.leatherFactoriesService.findOne(id)
+
+    return {
+      _id,
+      description,
+      country,
+      name,
+      articles: await Promise.all(
+        articles.map(async articleId => this.leatherArticlesService.findOneForFactory(articleId))
+      ),
+    }
   }
 
   @Patch(':id')
@@ -53,7 +72,9 @@ export class LeatherFactoriesController {
   async remove(@Param('id') id: string): Promise<LeatherFactoryEntity> {
     const factory = await this.findOne(id)
 
-    await Promise.all(factory.articles.map(article => this.leatherArticlesService.remove(article)))
+    await Promise.all(
+      factory.articles.map(article => this.leatherArticlesService.remove(article._id))
+    )
 
     return this.leatherFactoriesService.remove(id)
   }

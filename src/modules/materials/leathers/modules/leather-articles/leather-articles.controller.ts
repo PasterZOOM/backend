@@ -9,9 +9,10 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { FilterQuery } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
+import { LeatherColorEntity } from 'src/modules/materials/leathers/modules/leather-colors/entities/leather-color.entity'
 
 import { LeatherColorsService } from '../leather-colors/leather-colors.service'
 import { LeatherFactoriesService } from '../leather-factories/leather-factories.service'
@@ -53,13 +54,34 @@ export class LeatherArticlesController {
   }
 
   @Get()
-  async findAll(filter: FilterQuery<LeatherArticleEntity>): Promise<LeatherArticleEntity[]> {
+  @ApiOkResponse({
+    type: [PickType(LeatherArticleEntity, ['_id', 'name'])],
+  })
+  async findAll(
+    filter: FilterQuery<LeatherArticleEntity>
+  ): Promise<Pick<LeatherArticleEntity, '_id' | 'name'>[]> {
     return this.leatherArticlesService.findAll(filter)
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<LeatherArticleEntity> {
-    return this.leatherArticlesService.findOne(id)
+  @Get(':id') // TODO написать возвращаемый тип для swagger
+  async findOne(@Param('id') id: string): Promise<
+    Omit<LeatherArticleEntity, 'colors'> & {
+      colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
+    }
+  > {
+    const { _id, description, factory, name, colors } = await this.leatherArticlesService.findOne(
+      id
+    )
+
+    return {
+      _id,
+      description,
+      factory,
+      name,
+      colors: await Promise.all(
+        colors.map(async colorId => this.leatherColorService.findOneForArticle(colorId))
+      ),
+    }
   }
 
   @Patch(':id')
@@ -79,7 +101,7 @@ export class LeatherArticlesController {
       if (factory) {
         await this.leatherFactoriesService.pull(factory._id, { articles: id })
       }
-      await Promise.all(article.colors.map(color => this.leatherColorService.remove(color)))
+      await Promise.all(article.colors.map(color => this.leatherColorService.remove(color._id)))
 
       return this.leatherArticlesService.remove(id)
     } catch (e) {

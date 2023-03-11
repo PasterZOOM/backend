@@ -19,8 +19,8 @@ export class LeatherFactoriesService {
     return newLeatherFactory.save()
   }
 
-  async findAll(): Promise<LeatherFactoryEntity[]> {
-    return this.LeatherFactoryModel.find().sort().exec()
+  async findAll(): Promise<Pick<LeatherFactoryEntity, '_id' | 'name'>[]> {
+    return this.LeatherFactoryModel.find({}, { _id: 1, name: 1 }).sort().exec()
   }
 
   async findOne(id: string): Promise<LeatherFactoryEntity> {

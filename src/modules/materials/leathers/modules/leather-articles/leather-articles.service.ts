@@ -22,11 +22,15 @@ export class LeatherArticlesService {
   }
 
   async findAll(filter: FilterQuery<LeatherArticleEntity>): Promise<LeatherArticleEntity[]> {
-    return this.LeatherArticleModel.find(filter).exec()
+    return this.LeatherArticleModel.find(filter, { _id: 1, name: 1 }).sort().exec()
   }
 
   async findOne(id: string): Promise<LeatherArticleEntity> {
     return this.LeatherArticleModel.findById(id)
+  }
+
+  async findOneForFactory(id: string): Promise<Pick<LeatherArticleEntity, '_id' | 'name'>> {
+    return this.LeatherArticleModel.findById(id, { _id: 1, name: 1 })
   }
 
   async update(
