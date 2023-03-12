@@ -60,7 +60,9 @@ export class LeatherArticlesController {
   async findAll(
     filter: FilterQuery<LeatherArticleEntity>
   ): Promise<Pick<LeatherArticleEntity, '_id' | 'name'>[]> {
-    return this.leatherArticlesService.findAll(filter)
+    const articles = await this.leatherArticlesService.findAll(filter)
+
+    return articles.map(({ name, _id }) => ({ name, _id }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
@@ -79,7 +81,11 @@ export class LeatherArticlesController {
       factory,
       name,
       colors: await Promise.all(
-        colors.map(async colorId => this.leatherColorService.findOneForArticle(colorId))
+        colors.map(async colorId => {
+          const { _id, title } = await this.leatherColorService.findOne(colorId)
+
+          return { _id, title }
+        })
       ),
     }
   }

@@ -5,12 +5,12 @@ import { FilterQuery, Model } from 'mongoose'
 import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { UpdateLeatherColorDto } from './dto/update-leather-color.dto'
 import { LeatherColorEntity } from './entities/leather-color.entity'
-import { LeatherColor, LeatherColorDocument } from './schemas/leather-color.schema'
+import { LeatherColorAlias, LeatherColorDocument } from './schemas/leather-color.schema'
 
 @Injectable()
 export class LeatherColorsService {
   constructor(
-    @InjectModel(LeatherColor.name) private LeatherColorsModel: Model<LeatherColorDocument>
+    @InjectModel(LeatherColorAlias) private LeatherColorsModel: Model<LeatherColorDocument>
   ) {}
 
   async create(
@@ -27,10 +27,6 @@ export class LeatherColorsService {
 
   async findOne(id: string): Promise<LeatherColorEntity> {
     return this.LeatherColorsModel.findById(id)
-  }
-
-  async findOneForArticle(id: string): Promise<Pick<LeatherColorEntity, '_id' | 'title'>> {
-    return this.LeatherColorsModel.findById(id, { _id: 1, title: 1 })
   }
 
   async update(

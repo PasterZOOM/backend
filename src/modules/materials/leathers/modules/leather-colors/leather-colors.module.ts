@@ -5,11 +5,11 @@ import { LeatherArticlesModule } from '../leather-articles/leather-articles.modu
 
 import { LeatherColorsController } from './leather-colors.controller'
 import { LeatherColorsService } from './leather-colors.service'
-import { LeatherColor, LeatherColorSchema } from './schemas/leather-color.schema'
+import { LeatherColorAlias, LeatherColorSchema } from './schemas/leather-color.schema'
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: LeatherColor.name, schema: LeatherColorSchema }]),
+    MongooseModule.forFeature([{ name: LeatherColorAlias, schema: LeatherColorSchema }]),
     LeatherArticlesModule,
   ],
   controllers: [LeatherColorsController],

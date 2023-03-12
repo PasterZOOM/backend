@@ -12,6 +12,9 @@ export class LeatherColor implements Omit<LeatherColorEntity, '_id'> {
   article: string
 
   @Prop({ default: '' })
+  factory: string
+
+  @Prop({ default: '' })
   code: string
 
   @Prop({ default: '' })

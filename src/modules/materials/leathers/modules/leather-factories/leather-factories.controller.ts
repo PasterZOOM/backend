@@ -37,7 +37,9 @@ export class LeatherFactoriesController {
     type: [PickType(LeatherFactoryEntity, ['_id', 'name'])],
   })
   async findAll(): Promise<Pick<LeatherFactoryEntity, '_id' | 'name'>[]> {
-    return this.leatherFactoriesService.findAll()
+    const factories = await this.leatherFactoriesService.findAll()
+
+    return factories.map(({ name, _id }) => ({ name, _id }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
@@ -55,7 +57,11 @@ export class LeatherFactoriesController {
       country,
       name,
       articles: await Promise.all(
-        articles.map(async articleId => this.leatherArticlesService.findOneForFactory(articleId))
+        articles.map(async articleId => {
+          const { _id, name } = await this.leatherArticlesService.findOne(articleId)
+
+          return { _id, name }
+        })
       ),
     }
   }

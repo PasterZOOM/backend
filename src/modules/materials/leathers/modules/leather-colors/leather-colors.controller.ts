@@ -23,14 +23,12 @@ export class LeatherColorsController {
     @Param('articleId') articleId: string
   ): Promise<LeatherColorEntity> {
     try {
-      const article = await this.leatherArticlesService.findOne(articleId)
-
       const createdColor = await this.leatherColorsService.create({
         ...createLeatherColorDto,
         article: articleId,
       })
 
-      await this.leatherArticlesService.push(article._id, { colors: createdColor._id })
+      await this.leatherArticlesService.push(articleId, { colors: createdColor._id })
 
       return createdColor
     } catch (e) {
@@ -39,8 +37,10 @@ export class LeatherColorsController {
   }
 
   @Get()
-  async findAll(): Promise<LeatherColorEntity[]> {
-    return this.leatherColorsService.findAll()
+  async findAll(): Promise<Pick<LeatherColorEntity, '_id' | 'title'>[]> {
+    const colors = await this.leatherColorsService.findAll()
+
+    return colors.map(({ title, _id }) => ({ title, _id }))
   }
 
   @Get(':id')
