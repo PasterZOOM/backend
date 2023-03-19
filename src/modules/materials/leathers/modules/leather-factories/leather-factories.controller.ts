@@ -70,8 +70,29 @@ export class LeatherFactoriesController {
   async update(
     @Param('id') id: string,
     @Body() updateFactoryDto: UpdateLeatherFactoryDto
-  ): Promise<LeatherFactoryEntity> {
-    return this.leatherFactoriesService.update(id, updateFactoryDto)
+  ): Promise<
+    Omit<LeatherFactoryEntity, 'articles'> & {
+      articles: Pick<LeatherArticleEntity, '_id' | 'name'>[]
+    }
+  > {
+    const { articles, _id, description, country, name } = await this.leatherFactoriesService.update(
+      id,
+      updateFactoryDto
+    )
+
+    return {
+      _id,
+      country,
+      description,
+      name,
+      articles: await Promise.all(
+        articles.map(async articleId => {
+          const { _id, name } = await this.leatherArticlesService.findOne(articleId)
+
+          return { _id, name }
+        })
+      ),
+    }
   }
 
   @Delete(':id')

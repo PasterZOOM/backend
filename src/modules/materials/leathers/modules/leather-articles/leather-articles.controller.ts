@@ -67,18 +67,20 @@ export class LeatherArticlesController {
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(@Param('id') id: string): Promise<
-    Omit<LeatherArticleEntity, 'colors'> & {
+    Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
+      factory: { _id: string; name: string }
     }
   > {
     const { _id, description, factory, name, colors } = await this.leatherArticlesService.findOne(
       id
     )
+    const { name: factoryName } = await this.leatherFactoriesService.findOne(factory)
 
     return {
       _id,
       description,
-      factory,
+      factory: { _id: factory, name: factoryName },
       name,
       colors: await Promise.all(
         colors.map(async colorId => {
@@ -102,7 +104,7 @@ export class LeatherArticlesController {
   async remove(@Param('id') id: string): Promise<LeatherArticleEntity> {
     try {
       const article = await this.findOne(id)
-      const factory = await this.leatherFactoriesService.findOne(article.factory)
+      const factory = await this.leatherFactoriesService.findOne(article.factory._id)
 
       if (factory) {
         await this.leatherFactoriesService.pull(factory._id, { articles: id })
