@@ -48,14 +48,10 @@ export class LeatherFactoriesController {
       articles: Pick<LeatherArticleEntity, '_id' | 'name'>[]
     }
   > {
-    const { articles, _id, description, country, name } =
-      await this.leatherFactoriesService.findOne(id)
+    const { articles, ...factory } = await this.leatherFactoriesService.findOne(id)
 
     return {
-      _id,
-      description,
-      country,
-      name,
+      ...factory,
       articles: await Promise.all(
         articles.map(async articleId => {
           const { _id, name } = await this.leatherArticlesService.findOne(articleId)

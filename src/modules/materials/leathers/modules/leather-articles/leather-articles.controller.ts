@@ -72,16 +72,12 @@ export class LeatherArticlesController {
       factory: { _id: string; name: string }
     }
   > {
-    const { _id, description, factory, name, colors } = await this.leatherArticlesService.findOne(
-      id
-    )
-    const { name: factoryName } = await this.leatherFactoriesService.findOne(factory)
+    const { factory, colors, ...article } = await this.leatherArticlesService.findOne(id)
+    const { name } = await this.leatherFactoriesService.findOne(factory)
 
     return {
-      _id,
-      description,
-      factory: { _id: factory, name: factoryName },
-      name,
+      ...article,
+      factory: { _id: factory, name },
       colors: await Promise.all(
         colors.map(async colorId => {
           const { _id, title } = await this.leatherColorService.findOne(colorId)
@@ -92,7 +88,7 @@ export class LeatherArticlesController {
     }
   }
 
-  @Patch(':id')
+  @Patch(':id') // TODO сделать возможность изменять фабрику для артикула (так же реализовать это на фронте)
   async update(
     @Param('id') id: string,
     @Body() updateLeatherArticleDto: UpdateLeatherArticleDto

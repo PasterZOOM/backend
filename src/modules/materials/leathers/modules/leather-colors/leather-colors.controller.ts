@@ -43,9 +43,20 @@ export class LeatherColorsController {
     return colors.map(({ title, _id }) => ({ title, _id }))
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<LeatherColorEntity> {
-    return this.leatherColorsService.findOne(id)
+  @Get(':id') // TODO написать возвращаемый тип для swagger
+  async findOne(@Param('id') id: string): Promise<
+    Omit<LeatherColorEntity, 'article'> & {
+      article: { _id: string; name: string }
+    }
+  > {
+    const { article, ...color } = await this.leatherColorsService.findOne(id)
+
+    const { name } = await this.leatherArticlesService.findOne(article)
+
+    return {
+      ...color,
+      article: { _id: article, name },
+    }
   }
 
   @Patch(':id')
@@ -60,7 +71,7 @@ export class LeatherColorsController {
   async remove(@Param('id') id: string): Promise<LeatherColorEntity> {
     try {
       const color = await this.findOne(id)
-      const article = await this.leatherArticlesService.findOne(color.article)
+      const article = await this.leatherArticlesService.findOne(color.article._id)
 
       if (article) {
         await this.leatherArticlesService.pull(article._id, { colors: id })
