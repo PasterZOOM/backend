@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
+import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 
@@ -46,15 +47,21 @@ export class LeatherColorsController {
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(@Param('id') id: string): Promise<
     Omit<LeatherColorEntity, 'article'> & {
-      article: { _id: string; name: string }
+      article: Pick<LeatherArticleEntity, '_id' | 'name'>
     }
   > {
-    const { article, ...color } = await this.leatherColorsService.findOne(id)
+    const { article, _id, photo, description, title, value, code } =
+      await this.leatherColorsService.findOne(id)
 
     const { name } = await this.leatherArticlesService.findOne(article)
 
     return {
-      ...color,
+      _id,
+      photo,
+      code,
+      value,
+      title,
+      description,
       article: { _id: article, name },
     }
   }
@@ -63,15 +70,30 @@ export class LeatherColorsController {
   async update(
     @Param('id') id: string,
     @Body() updateLeatherColorDto: UpdateLeatherColorDto
-  ): Promise<LeatherColorEntity> {
-    return this.leatherColorsService.update(id, updateLeatherColorDto)
+  ): Promise<
+    Omit<LeatherColorEntity, 'article'> & { article: Pick<LeatherArticleEntity, '_id' | 'name'> }
+  > {
+    const { article, _id, description, title, value, code, photo } =
+      await this.leatherColorsService.update(id, updateLeatherColorDto)
+
+    const { name } = await this.leatherArticlesService.findOne(article)
+
+    return {
+      _id,
+      description,
+      title,
+      value,
+      code,
+      photo,
+      article: { _id: article, name },
+    }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<LeatherColorEntity> {
     try {
-      const color = await this.findOne(id)
-      const article = await this.leatherArticlesService.findOne(color.article._id)
+      const color = await this.leatherColorsService.findOne(id)
+      const article = await this.leatherArticlesService.findOne(color.article)
 
       if (article) {
         await this.leatherArticlesService.pull(article._id, { colors: id })
