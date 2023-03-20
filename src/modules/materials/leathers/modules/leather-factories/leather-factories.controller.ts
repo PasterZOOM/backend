@@ -10,8 +10,10 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
+import { Promise } from 'mongoose'
 import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from 'src/modules/materials/leathers/modules/leather-articles/leather-articles.service'
+import { LeatherColorsService } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.service'
 
 import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
 import { UpdateLeatherFactoryDto } from './dto/update-leather-factory.dto'
@@ -22,6 +24,8 @@ import { LeatherFactoriesService } from './leather-factories.service'
 @Controller('leather-factories')
 export class LeatherFactoriesController {
   constructor(
+    @Inject(forwardRef(() => LeatherColorsService))
+    private readonly leatherColorService: LeatherColorsService,
     private readonly leatherFactoriesService: LeatherFactoriesService,
     @Inject(forwardRef(() => LeatherArticlesService))
     private readonly leatherArticlesService: LeatherArticlesService
@@ -48,10 +52,14 @@ export class LeatherFactoriesController {
       articles: Pick<LeatherArticleEntity, '_id' | 'name'>[]
     }
   > {
-    const { articles, ...factory } = await this.leatherFactoriesService.findOne(id)
+    const { articles, _id, description, country, name } =
+      await this.leatherFactoriesService.findOne(id)
 
     return {
-      ...factory,
+      _id,
+      description,
+      country,
+      name,
       articles: await Promise.all(
         articles.map(async articleId => {
           const { _id, name } = await this.leatherArticlesService.findOne(articleId)
@@ -93,10 +101,16 @@ export class LeatherFactoriesController {
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<LeatherFactoryEntity> {
-    const factory = await this.findOne(id)
+    const factory = await this.leatherFactoriesService.findOne(id)
 
     await Promise.all(
-      factory.articles.map(article => this.leatherArticlesService.remove(article._id))
+      factory.articles.map(async article => {
+        const { colors } = await this.leatherArticlesService.findOne(article)
+
+        await Promise.all(colors.map(color => this.leatherColorService.remove(color)))
+
+        return this.leatherArticlesService.remove(article)
+      })
     )
 
     return this.leatherFactoriesService.remove(id)
