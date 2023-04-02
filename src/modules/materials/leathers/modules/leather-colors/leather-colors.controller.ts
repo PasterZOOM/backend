@@ -8,8 +8,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 
@@ -49,10 +50,15 @@ export class LeatherColorsController {
   }
 
   @Get()
-  async findAll(): Promise<Pick<LeatherColorEntity, '_id' | 'title'>[]> {
-    const colors = await this.leatherColorsService.findAll()
+  @ApiQuery({ name: '_id', required: false })
+  async findAll(
+    @Query('_id') _id?: string[]
+  ): Promise<Pick<LeatherColorEntity, '_id' | 'title' | 'photo'>[]> {
+    const colors = await this.leatherColorsService.findAll(
+      _id ? { $or: _id.map(_id => ({ _id })) } : undefined
+    )
 
-    return colors.map(({ title, _id }) => ({ title, _id }))
+    return colors.map(({ title, _id, photo }) => ({ title, _id, photo }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger

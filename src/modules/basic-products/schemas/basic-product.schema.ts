@@ -41,7 +41,7 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ default: EProductCategory.WATCH_STRAP })
   category: EProductCategory
 
-  @Prop({ type: Object })
+  @Prop({ type: Object, default: {} })
   photos: PhotosType
 }
 
