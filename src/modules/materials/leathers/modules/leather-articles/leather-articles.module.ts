@@ -10,8 +10,8 @@ import { LeatherArticleAlias, LeatherArticleSchema } from './schemas/leather-art
 
 @Module({
   imports: [
-    LeatherFactoriesModule,
     forwardRef(() => LeatherColorsModule),
+    forwardRef(() => LeatherFactoriesModule),
     MongooseModule.forFeature([{ name: LeatherArticleAlias, schema: LeatherArticleSchema }]),
   ],
   controllers: [LeatherArticlesController],

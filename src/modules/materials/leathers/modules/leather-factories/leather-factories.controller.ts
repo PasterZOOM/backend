@@ -10,7 +10,6 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
-import { Promise } from 'mongoose'
 import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from 'src/modules/materials/leathers/modules/leather-articles/leather-articles.service'
 import { LeatherColorsService } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.service'
@@ -24,9 +23,9 @@ import { LeatherFactoriesService } from './leather-factories.service'
 @Controller('leather-factories')
 export class LeatherFactoriesController {
   constructor(
+    private readonly leatherFactoriesService: LeatherFactoriesService,
     @Inject(forwardRef(() => LeatherColorsService))
     private readonly leatherColorService: LeatherColorsService,
-    private readonly leatherFactoriesService: LeatherFactoriesService,
     @Inject(forwardRef(() => LeatherArticlesService))
     private readonly leatherArticlesService: LeatherArticlesService
   ) {}

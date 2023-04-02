@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  forwardRef,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
@@ -15,6 +25,7 @@ import { LeatherColorsService } from './leather-colors.service'
 export class LeatherColorsController {
   constructor(
     private readonly leatherColorsService: LeatherColorsService,
+    @Inject(forwardRef(() => LeatherArticlesService))
     private readonly leatherArticlesService: LeatherArticlesService
   ) {}
 

@@ -1,21 +1,25 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { FilterQuery } from 'mongoose'
-import { BasicProductEntity } from 'src/modules/basic-products/entities/basic-product.entity'
-import { EFilterKeys } from 'src/modules/basic-products/entities/basic-product.type'
-import { BasicProductDocument } from 'src/modules/basic-products/schemas/basic-product.schema'
-import { LeatherColorsService } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.service'
+
+import { LeatherArticleEntity } from '../materials/leathers/modules/leather-articles/entities/leather-article.entity'
+import { LeatherArticlesService } from '../materials/leathers/modules/leather-articles/leather-articles.service'
+import { LeatherColorsService } from '../materials/leathers/modules/leather-colors/leather-colors.service'
 
 import { BasicProductsService } from './basic-products.service'
 import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
+import { BasicProductEntity } from './entities/basic-product.entity'
+import { EFilterKeys } from './entities/basic-product.type'
+import { BasicProductDocument } from './schemas/basic-product.schema'
 
 @ApiTags('Basic-products')
 @Controller('basic-products')
 export class BasicProductsController {
   constructor(
     private readonly basicProductsService: BasicProductsService,
-    private readonly leatherColorsService: LeatherColorsService
+    private readonly leatherColorsService: LeatherColorsService,
+    private readonly leatherArticlesService: LeatherArticlesService
   ) {}
 
   @Post()
@@ -23,7 +27,7 @@ export class BasicProductsController {
     return this.basicProductsService.create(createBasicProductDto)
   }
 
-  @Get()
+  @Get() // TODO написать возвращаемый тип для swagger
   @ApiQuery({ name: EFilterKeys.ASSIGNMENTS, required: false })
   @ApiQuery({ name: EFilterKeys.CATEGORIES, required: false })
   @ApiQuery({ name: EFilterKeys.LEATHER_COLORS, required: false })
@@ -33,7 +37,11 @@ export class BasicProductsController {
     @Query(EFilterKeys.CATEGORIES) categories?: string[],
     @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[],
     @Query(EFilterKeys.LEATHERS) leathers?: string[]
-  ): Promise<BasicProductEntity[]> {
+  ): Promise<
+    Awaited<
+      Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'name'> }
+    >[]
+  > {
     const filters = async (): Promise<FilterQuery<BasicProductDocument>> => {
       const filters: Partial<Record<EFilterKeys, string[] | undefined>> = {}
 
@@ -59,6 +67,7 @@ export class BasicProductsController {
           }
         }
       })
+
       let categoriesArray = []
       let leathersArray = []
       let assignmentsArray = []
@@ -87,12 +96,78 @@ export class BasicProductsController {
       }
     }
 
-    return this.basicProductsService.findAll(await filters())
+    const basicProducts = await this.basicProductsService.findAll(await filters())
+
+    return Promise.all(
+      basicProducts.map(
+        async ({
+          category,
+          description,
+          costCurrency,
+          cost,
+          leather,
+          assignments,
+          punchPitch,
+          photos,
+          _id,
+          size,
+          title,
+        }) => {
+          const { name } = await this.leatherArticlesService.findOne(leather)
+
+          return {
+            assignments,
+            title,
+            _id,
+            size,
+            punchPitch,
+            photos,
+            costCurrency,
+            description,
+            category,
+            cost,
+            leather: { _id: leather, name },
+          }
+        }
+      )
+    )
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<BasicProductEntity> {
-    return this.basicProductsService.findOne(id)
+  @Get(':id') // TODO написать возвращаемый тип для swagger
+  async findOne(
+    @Param('id') id: string
+  ): Promise<
+    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'name'> }
+  > {
+    const {
+      assignments,
+      leather,
+      description,
+      category,
+      cost,
+      costCurrency,
+      photos,
+      punchPitch,
+      size,
+      _id,
+      title,
+    } = await this.basicProductsService.findOne(id)
+
+    const { name } = await this.leatherArticlesService.findOne(leather)
+
+    return {
+      assignments,
+      title,
+      _id,
+      size,
+      punchPitch,
+      photos,
+      costCurrency,
+      description,
+      category,
+      cost,
+      leather: { _id: leather, name },
+    }
   }
 
   @Patch(':id')
