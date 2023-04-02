@@ -39,7 +39,7 @@ export class BasicProductsController {
     @Query(EFilterKeys.LEATHERS) leathers?: string[]
   ): Promise<
     Awaited<
-      Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'name'> }
+      Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
     >[]
   > {
     const filters = async (): Promise<FilterQuery<BasicProductDocument>> => {
@@ -77,7 +77,13 @@ export class BasicProductsController {
         categoriesArray = filters.categories.map(category => ({ category }))
       }
       if (filters.leathers) {
-        leathersArray = filters.leathers.map(leather => ({ leather }))
+        leathersArray = await Promise.all(
+          filters.leathers.map(async leather => {
+            const { _id } = await this.leatherArticlesService.find({ title: leather })
+
+            return { leather: _id }
+          })
+        )
       }
       if (filters.assignments) {
         assignmentsArray = filters.assignments.map(assignments => ({ assignments }))
@@ -113,7 +119,7 @@ export class BasicProductsController {
           size,
           title,
         }) => {
-          const { name } = await this.leatherArticlesService.findOne(leather)
+          const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
 
           return {
             assignments,
@@ -126,7 +132,7 @@ export class BasicProductsController {
             description,
             category,
             cost,
-            leather: { _id: leather, name },
+            leather: { _id: leather, title: leatherTitle },
           }
         }
       )
@@ -137,7 +143,7 @@ export class BasicProductsController {
   async findOne(
     @Param('id') id: string
   ): Promise<
-    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'name'> }
+    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
   > {
     const {
       assignments,
@@ -153,7 +159,7 @@ export class BasicProductsController {
       title,
     } = await this.basicProductsService.findOne(id)
 
-    const { name } = await this.leatherArticlesService.findOne(leather)
+    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
 
     return {
       assignments,
@@ -166,7 +172,7 @@ export class BasicProductsController {
       description,
       category,
       cost,
-      leather: { _id: leather, name },
+      leather: { _id: leather, title: leatherTitle },
     }
   }
 

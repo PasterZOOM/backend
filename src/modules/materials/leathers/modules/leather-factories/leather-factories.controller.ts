@@ -37,33 +37,33 @@ export class LeatherFactoriesController {
 
   @Get()
   @ApiOkResponse({
-    type: [PickType(LeatherFactoryEntity, ['_id', 'name'])],
+    type: [PickType(LeatherFactoryEntity, ['_id', 'title'])],
   })
-  async findAll(): Promise<Pick<LeatherFactoryEntity, '_id' | 'name'>[]> {
+  async findAll(): Promise<Pick<LeatherFactoryEntity, '_id' | 'title'>[]> {
     const factories = await this.leatherFactoriesService.findAll()
 
-    return factories.map(({ name, _id }) => ({ name, _id }))
+    return factories.map(({ title, _id }) => ({ title, _id }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(@Param('id') id: string): Promise<
     Omit<LeatherFactoryEntity, 'articles'> & {
-      articles: Pick<LeatherArticleEntity, '_id' | 'name'>[]
+      articles: Pick<LeatherArticleEntity, '_id' | 'title'>[]
     }
   > {
-    const { articles, _id, description, country, name } =
+    const { articles, _id, description, country, title } =
       await this.leatherFactoriesService.findOne(id)
 
     return {
       _id,
       description,
       country,
-      name,
+      title,
       articles: await Promise.all(
         articles.map(async articleId => {
-          const { _id, name } = await this.leatherArticlesService.findOne(articleId)
+          const { _id, title } = await this.leatherArticlesService.findOne(articleId)
 
-          return { _id, name }
+          return { _id, title }
         })
       ),
     }
@@ -75,24 +75,22 @@ export class LeatherFactoriesController {
     @Body() updateFactoryDto: UpdateLeatherFactoryDto
   ): Promise<
     Omit<LeatherFactoryEntity, 'articles'> & {
-      articles: Pick<LeatherArticleEntity, '_id' | 'name'>[]
+      articles: Pick<LeatherArticleEntity, '_id' | 'title'>[]
     }
   > {
-    const { articles, _id, description, country, name } = await this.leatherFactoriesService.update(
-      id,
-      updateFactoryDto
-    )
+    const { articles, _id, description, country, title } =
+      await this.leatherFactoriesService.update(id, updateFactoryDto)
 
     return {
       _id,
       country,
       description,
-      name,
+      title,
       articles: await Promise.all(
         articles.map(async articleId => {
-          const { _id, name } = await this.leatherArticlesService.findOne(articleId)
+          const { _id, title } = await this.leatherArticlesService.findOne(articleId)
 
-          return { _id, name }
+          return { _id, title }
         })
       ),
     }

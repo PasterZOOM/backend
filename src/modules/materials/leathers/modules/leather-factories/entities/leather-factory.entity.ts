@@ -22,5 +22,5 @@ export class LeatherFactoryEntity {
   description?: string = ''
 
   @ApiProperty({ type: String, description: 'название фабрики' })
-  name: string
+  title: string
 }

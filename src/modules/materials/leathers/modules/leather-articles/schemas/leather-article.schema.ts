@@ -17,7 +17,7 @@ export class LeatherArticle implements Omit<LeatherArticleEntity, '_id'> {
   factory: string
 
   @Prop({ default: '' })
-  name: string
+  title: string
 }
 
 export const LeatherArticleSchema = SchemaFactory.createForClass(LeatherArticle)

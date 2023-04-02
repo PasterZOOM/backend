@@ -64,13 +64,13 @@ export class LeatherColorsController {
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(@Param('id') id: string): Promise<
     Omit<LeatherColorEntity, 'article'> & {
-      article: Pick<LeatherArticleEntity, '_id' | 'name'>
+      article: Pick<LeatherArticleEntity, '_id' | 'title'>
     }
   > {
     const { article, _id, photo, description, title, value, code } =
       await this.leatherColorsService.findOne(id)
 
-    const { name } = await this.leatherArticlesService.findOne(article)
+    const { title: articleTitle } = await this.leatherArticlesService.findOne(article)
 
     return {
       _id,
@@ -79,7 +79,7 @@ export class LeatherColorsController {
       value,
       title,
       description,
-      article: { _id: article, name },
+      article: { _id: article, title: articleTitle },
     }
   }
 
@@ -88,12 +88,12 @@ export class LeatherColorsController {
     @Param('id') id: string,
     @Body() updateLeatherColorDto: UpdateLeatherColorDto
   ): Promise<
-    Omit<LeatherColorEntity, 'article'> & { article: Pick<LeatherArticleEntity, '_id' | 'name'> }
+    Omit<LeatherColorEntity, 'article'> & { article: Pick<LeatherArticleEntity, '_id' | 'title'> }
   > {
     const { article, _id, description, title, value, code, photo } =
       await this.leatherColorsService.update(id, updateLeatherColorDto)
 
-    const { name } = await this.leatherArticlesService.findOne(article)
+    const { title: articleTitle } = await this.leatherArticlesService.findOne(article)
 
     return {
       _id,
@@ -102,7 +102,7 @@ export class LeatherColorsController {
       value,
       code,
       photo,
-      article: { _id: article, name },
+      article: { _id: article, title: articleTitle },
     }
   }
 

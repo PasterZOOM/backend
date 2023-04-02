@@ -57,33 +57,33 @@ export class LeatherArticlesController {
 
   @Get()
   @ApiOkResponse({
-    type: [PickType(LeatherArticleEntity, ['_id', 'name'])],
+    type: [PickType(LeatherArticleEntity, ['_id', 'title'])],
   })
   async findAll(
     filter: FilterQuery<LeatherArticleEntity>
-  ): Promise<Pick<LeatherArticleEntity, '_id' | 'name'>[]> {
+  ): Promise<Pick<LeatherArticleEntity, '_id' | 'title'>[]> {
     const articles = await this.leatherArticlesService.findAll(filter)
 
-    return articles.map(({ name, _id }) => ({ name, _id }))
+    return articles.map(({ title, _id }) => ({ title, _id }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(@Param('id') id: string): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
-      factory: Pick<LeatherFactoryEntity, '_id' | 'name'>
+      factory: Pick<LeatherFactoryEntity, '_id' | 'title'>
     }
   > {
-    const { _id, description, factory, name, colors } = await this.leatherArticlesService.findOne(
+    const { _id, description, factory, title, colors } = await this.leatherArticlesService.findOne(
       id
     )
-    const { name: factoryName } = await this.leatherFactoriesService.findOne(factory)
+    const { title: factoryTitle } = await this.leatherFactoriesService.findOne(factory)
 
     return {
       _id,
       description,
-      name,
-      factory: { _id: factory, name: factoryName },
+      title,
+      factory: { _id: factory, title: factoryTitle },
       colors: await Promise.all(
         colors.map(async colorId => {
           const { _id, title } = await this.leatherColorService.findOne(colorId)
@@ -101,21 +101,21 @@ export class LeatherArticlesController {
   ): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
-      factory: Pick<LeatherFactoryEntity, '_id' | 'name'>
+      factory: Pick<LeatherFactoryEntity, '_id' | 'title'>
     }
   > {
-    const { _id, name, colors, description, factory } = await this.leatherArticlesService.update(
+    const { _id, title, colors, description, factory } = await this.leatherArticlesService.update(
       id,
       updateLeatherArticleDto
     )
 
-    const { name: factoryName } = await this.leatherFactoriesService.findOne(factory)
+    const { title: factoryTitle } = await this.leatherFactoriesService.findOne(factory)
 
     return {
       _id,
       description,
-      name,
-      factory: { _id: factory, name: factoryName },
+      title,
+      factory: { _id: factory, title: factoryTitle },
       colors: await Promise.all(
         colors.map(async colorId => {
           const { _id, title } = await this.leatherColorService.findOne(colorId)
