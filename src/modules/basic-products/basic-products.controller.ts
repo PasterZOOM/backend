@@ -96,7 +96,7 @@ export class BasicProductsController {
         $and: [
           categoriesArray.length ? { $or: categoriesArray } : {},
           leathersArray.length ? { $or: leathersArray } : {},
-          assignmentsArray.length ? { $or: assignmentsArray } : {},
+          assignmentsArray.length ? { $and: assignmentsArray } : {}, // TODO: проработать этот момент с UX, and или or
           colorsArray.length ? { $or: colorsArray } : {},
         ],
       }
@@ -176,12 +176,42 @@ export class BasicProductsController {
     }
   }
 
-  @Patch(':id')
+  @Patch(':id') // TODO написать возвращаемый тип для swagger
   async update(
     @Param('id') id: string,
     @Body() updateBasicProductDto: UpdateBasicProductDto
-  ): Promise<BasicProductEntity> {
-    return this.basicProductsService.update(id, updateBasicProductDto)
+  ): Promise<
+    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
+  > {
+    const {
+      _id,
+      description,
+      title,
+      photos,
+      punchPitch,
+      size,
+      leather,
+      assignments,
+      costCurrency,
+      cost,
+      category,
+    } = await this.basicProductsService.update(id, updateBasicProductDto)
+
+    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
+
+    return {
+      assignments,
+      title,
+      _id,
+      size,
+      punchPitch,
+      photos,
+      costCurrency,
+      description,
+      category,
+      cost,
+      leather: { _id: leather, title: leatherTitle },
+    }
   }
 
   @Delete(':id')
