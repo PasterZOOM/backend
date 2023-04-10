@@ -1,5 +1,5 @@
 export type ProductPhotoType = {
-  id: string
+  _id: string
   url: string
 }
 export enum EFilterKeys {

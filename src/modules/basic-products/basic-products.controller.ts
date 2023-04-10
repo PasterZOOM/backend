@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { FilterQuery } from 'mongoose'
+import { v1 } from 'uuid'
 
 import { LeatherArticleEntity } from '../materials/leathers/modules/leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from '../materials/leathers/modules/leather-articles/leather-articles.service'
@@ -217,5 +218,101 @@ export class BasicProductsController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<BasicProductEntity> {
     return this.basicProductsService.remove(id)
+  }
+
+  @Put(':id/photo')
+  async addPhoto(
+    @Param('id') id: string,
+    @Body() photo: { [key: string]: string[] }
+  ): Promise<
+    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
+  > {
+    const product = await this.basicProductsService.findOne(id)
+
+    Object.keys(photo).forEach(key => {
+      const photos = photo[key].map(url => ({ _id: v1(), url }))
+
+      if (product.photos[key]) {
+        product.photos[key] = [...product.photos[key], ...photos]
+      } else {
+        product.photos[key] = photos
+      }
+    })
+
+    const {
+      _id,
+      description,
+      title,
+      photos,
+      punchPitch,
+      size,
+      leather,
+      assignments,
+      costCurrency,
+      cost,
+      category,
+    } = await this.basicProductsService.update(id, { photos: product.photos })
+
+    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
+
+    return {
+      assignments,
+      title,
+      _id,
+      size,
+      punchPitch,
+      photos,
+      costCurrency,
+      description,
+      category,
+      cost,
+      leather: { _id: leather, title: leatherTitle },
+    }
+  }
+
+  @Delete(':productId/photo/:photoId')
+  async removePhoto(
+    @Param('productId') productId: string,
+    @Param('photoId') photoId: string
+  ): Promise<
+    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
+  > {
+    const product = await this.basicProductsService.findOne(productId)
+
+    Object.keys(product.photos).forEach(key => {
+      const newArray = product.photos[key].filter(ph => ph._id !== photoId)
+
+      product.photos[key] = newArray.length ? newArray : undefined
+    })
+
+    const {
+      _id,
+      description,
+      title,
+      photos,
+      punchPitch,
+      size,
+      leather,
+      assignments,
+      costCurrency,
+      cost,
+      category,
+    } = await this.basicProductsService.update(productId, { photos: product.photos })
+
+    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
+
+    return {
+      assignments,
+      title,
+      _id,
+      size,
+      punchPitch,
+      photos,
+      costCurrency,
+      description,
+      category,
+      cost,
+      leather: { _id: leather, title: leatherTitle },
+    }
   }
 }
