@@ -1,5 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { DeliveryOrderDataEntity } from '../entities/deliveryOrderData.entity'
@@ -55,11 +55,11 @@ export class Order implements Omit<OrderEntity, '_id'> {
   @Prop({ default: '' })
   number: string
 
-  @Prop({ default: '' })
-  ownerId: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  ownerId: Types.ObjectId
 
-  @Prop({ type: [String], default: '' })
-  products: string[]
+  @Prop({ type: [SchemaTypes.ObjectId], default: '' })
+  products: Types.ObjectId[]
 
   @Prop({ default: EOrderStatus.REGISTERED })
   status: TOrderStatus

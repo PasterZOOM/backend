@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 
 import { PersonEntity } from '../entities/person.entity'
 import {
@@ -16,8 +16,8 @@ export type PersonDocument = Person & Document
 
 @Schema()
 export class Person implements Omit<PersonEntity, '_id'> {
-  @Prop({ type: [String], default: [] })
-  addressIds: string[]
+  @Prop({ type: [SchemaTypes.ObjectId], default: [] })
+  addressIds: Types.ObjectId[]
 
   @Prop({ default: ECommunicationMethod.PHONE })
   communicationMethod: TCommunicationMethod
@@ -43,8 +43,8 @@ export class Person implements Omit<PersonEntity, '_id'> {
   @Prop({ required: true })
   lastName: string
 
-  @Prop({ type: [String], default: [] })
-  orderIds: string[]
+  @Prop({ type: [SchemaTypes.ObjectId], default: [] })
+  orderIds: Types.ObjectId[]
 
   @Prop({ default: '' })
   patronymic: string

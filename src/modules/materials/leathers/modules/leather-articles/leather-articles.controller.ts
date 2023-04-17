@@ -10,7 +10,7 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
-import { FilterQuery } from 'mongoose'
+import { FilterQuery, Types } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { LeatherColorEntity } from 'src/modules/materials/leathers/modules/leather-colors/entities/leather-color.entity'
 import { LeatherFactoryEntity } from 'src/modules/materials/leathers/modules/leather-factories/entities/leather-factory.entity'
@@ -37,7 +37,7 @@ export class LeatherArticlesController {
   @Post(':factoryId')
   async create(
     @Body() createLeatherArticleDto: CreateLeatherArticleDto,
-    @Param('factoryId') factoryId: string
+    @Param('factoryId') factoryId: Types.ObjectId
   ): Promise<LeatherArticleEntity> {
     try {
       const factory = await this.leatherFactoriesService.findOne(factoryId)
@@ -68,7 +68,7 @@ export class LeatherArticlesController {
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
-  async findOne(@Param('id') id: string): Promise<
+  async findOne(@Param('id') id: Types.ObjectId): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
       factory: Pick<LeatherFactoryEntity, '_id' | 'title'>
@@ -96,7 +96,7 @@ export class LeatherArticlesController {
 
   @Patch(':id') // TODO сделать возможность изменять фабрику для артикула (так же реализовать это на фронте)
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateLeatherArticleDto: UpdateLeatherArticleDto
   ): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
@@ -127,7 +127,7 @@ export class LeatherArticlesController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<LeatherArticleEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<LeatherArticleEntity> {
     try {
       const article = await this.leatherArticlesService.findOne(id)
       const factory = await this.leatherFactoriesService.findOne(article.factory)

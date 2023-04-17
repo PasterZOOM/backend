@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 
 import { AddressEntity } from '../entities/address.entity'
 import {
@@ -34,8 +34,8 @@ export class Address implements Omit<AddressEntity, '_id'> {
   @Prop({ default: '' })
   index: string
 
-  @Prop({ default: '' })
-  ownerId: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  ownerId: Types.ObjectId
 
   @Prop({ default: '' })
   region: string

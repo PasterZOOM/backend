@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 import { ECost } from 'src/common/interfaces/cost.type'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
 
@@ -23,8 +23,8 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ default: '' })
   description: string
 
-  @Prop({ default: '' })
-  leather: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  leather: Types.ObjectId
 
   @Prop({ default: EPunchPitch.LITTLE })
   punchPitch: EPunchPitch
@@ -43,6 +43,9 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
 
   @Prop({ type: Object, default: {} })
   photos: PhotosType
+
+  @Prop({ default: false })
+  isPublished: boolean
 }
 
 export const BasicProductSchema = SchemaFactory.createForClass(BasicProduct)

@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 
 import { CreatePersonDto } from './dto/create-person.dto'
 import { UpdatePersonDto } from './dto/update-person.dto'
@@ -22,20 +23,20 @@ export class PersonsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<PersonEntity> {
+  findOne(@Param('id') id: Types.ObjectId): Promise<PersonEntity> {
     return this.personsService.findOne(id)
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updatePersonDto: UpdatePersonDto
   ): Promise<PersonEntity> {
     return this.personsService.update(id, updatePersonDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<PersonEntity> {
+  remove(@Param('id') id: Types.ObjectId): Promise<PersonEntity> {
     return this.personsService.remove(id)
   }
 }

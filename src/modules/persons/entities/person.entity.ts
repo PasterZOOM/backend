@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 
 import {
   ECommunicationMethod,
@@ -12,14 +13,14 @@ import {
 } from './persons.type'
 
 export class PersonEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер персоны' })
-  _id: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер персоны' })
+  _id: Types.ObjectId
 
   @ApiProperty({
-    type: [String],
-    description: 'масив содержащий id адресов пренадлежащих персоне, индекс 0 - ОСНОВНОЙ адрес',
+    type: [SchemaTypes.ObjectId],
+    description: 'массив содержащий id адресов принадлежащих персоне, индекс 0 - ОСНОВНОЙ адрес',
   })
-  addressIds: string[]
+  addressIds: Types.ObjectId[]
 
   @ApiProperty({
     enum: ECommunicationMethod,
@@ -49,8 +50,11 @@ export class PersonEntity {
   @ApiProperty({ type: String, description: 'имя персоны' })
   lastName: string
 
-  @ApiProperty({ type: [String], description: 'масив содержащий id заказов пренадлежащих персоне' })
-  orderIds: string[]
+  @ApiProperty({
+    type: [SchemaTypes.ObjectId],
+    description: 'массив содержащий id заказов принадлежащих персоне',
+  })
+  orderIds: Types.ObjectId[]
 
   @ApiProperty({ type: String, description: 'отчество персоны' })
   patronymic?: string = ''
@@ -70,7 +74,7 @@ export class PersonEntity {
   @ApiProperty({ type: String, description: 'номер viber' })
   viber?: string = ''
 
-  @ApiProperty({ type: String, description: 'ссылка на вконтакте' })
+  @ApiProperty({ type: String, description: 'ссылка на Вконтакте' })
   vk?: string = ''
 
   @ApiProperty({ type: String, description: 'номер whatsApp' })

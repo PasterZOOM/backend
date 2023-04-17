@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 
 import { CreatePersonDto } from './dto/create-person.dto'
 import { UpdatePersonDto } from './dto/update-person.dto'
@@ -21,35 +21,39 @@ export class PersonsService {
     return this.PersonModel.find().sort().exec()
   }
 
-  async findOne(id: string): Promise<PersonEntity> {
+  async findOne(id: Types.ObjectId): Promise<PersonEntity> {
     return this.PersonModel.findById(id)
   }
 
-  async update(id: string, updatePersonDto: UpdatePersonDto): Promise<PersonEntity> {
+  async update(id: Types.ObjectId, updatePersonDto: UpdatePersonDto): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndUpdate(id, updatePersonDto)
   }
 
-  async remove(id: string): Promise<PersonEntity> {
+  async remove(id: Types.ObjectId): Promise<PersonEntity> {
     await this.PersonModel.findByIdAndRemove(id)
 
     return this.findOne(id)
   }
 
   async push(
-    id: string,
-    addToSet: { [key in keyof Partial<Pick<PersonEntity, 'addressIds' | 'orderIds'>>]: string }
+    id: Types.ObjectId,
+    addToSet: {
+      [key in keyof Partial<Pick<PersonEntity, 'addressIds' | 'orderIds'>>]: Types.ObjectId
+    }
   ): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndUpdate(id, { $addToSet: addToSet })
   }
 
   async pull(
-    id: string,
-    pulled: { [key in keyof Partial<Pick<PersonEntity, 'addressIds' | 'orderIds'>>]: string }
+    id: Types.ObjectId,
+    pulled: {
+      [key in keyof Partial<Pick<PersonEntity, 'addressIds' | 'orderIds'>>]: Types.ObjectId
+    }
   ): Promise<PersonEntity> {
     return this.PersonModel.findByIdAndUpdate(id, { $pull: pulled })
   }
 
-  async makeAddressMain(id: string): Promise<{ addressIds: string[] }> {
+  async makeAddressMain(id: Types.ObjectId): Promise<{ addressIds: Types.ObjectId[] }> {
     const { _id, addressIds } = await this.PersonModel.findOne({ addressIds: id }, [
       '_id',
       'addressIds',

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { DeliveryOrderDataEntity } from './deliveryOrderData.entity'
@@ -6,8 +7,8 @@ import { OrderDateEntity } from './orderDate.entity'
 import { EOrderStatus, TOrderStatus } from './orders.type'
 
 export class OrderEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер заказа' })
-  _id: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер заказа' })
+  _id: Types.ObjectId
 
   @ApiProperty({ type: String, description: 'комментарий к заказу' })
   comment: string
@@ -21,11 +22,11 @@ export class OrderEntity {
   @ApiProperty({ type: String, description: 'номер заказа' })
   number: string
 
-  @ApiProperty({ type: String, description: 'идентификационный номер закачика' })
-  ownerId: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер заказчика' })
+  ownerId: Types.ObjectId
 
-  @ApiProperty({ type: String, description: 'идентификационные номера изделий' })
-  products: string[]
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационные номера изделий' })
+  products: Types.ObjectId[]
 
   @ApiProperty({
     enum: EOrderStatus,

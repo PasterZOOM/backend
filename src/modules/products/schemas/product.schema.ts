@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
@@ -22,11 +22,11 @@ export class Product implements Omit<ProductEntity, '_id'> {
   @Prop({ default: '' })
   description: string
 
-  @Prop({ default: '' })
-  leather: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  leather: Types.ObjectId
 
-  @Prop({ default: '' })
-  orderId: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  orderId: Types.ObjectId
 
   @Prop({ default: '' })
   photo: string
@@ -37,8 +37,8 @@ export class Product implements Omit<ProductEntity, '_id'> {
   @Prop({ default: '' })
   size: string
 
-  @Prop({ default: '' })
-  thread: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  thread: Types.ObjectId
 
   @Prop({ default: '' })
   title: string

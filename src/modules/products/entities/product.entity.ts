@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
@@ -6,8 +7,8 @@ import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 import { EProductCategory, TProductAssignment, TProductCategory } from './product.type'
 
 export class ProductEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер изделия' })
-  _id: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер изделия' })
+  _id: Types.ObjectId
 
   @ApiProperty({
     type: [String],
@@ -34,17 +35,17 @@ export class ProductEntity {
   description?: string = ''
 
   @ApiProperty({
-    type: String,
+    type: SchemaTypes.ObjectId,
     description: 'идентификационный номер кожи из которой изготовлено изделие',
   })
-  leather: string
+  leather: Types.ObjectId
 
   @ApiProperty({
-    type: String,
+    type: SchemaTypes.ObjectId,
     description:
-      "идентиифкационный номер заказа для которого было изготовлено изделие, '' - изделие в наличии",
+      "идентификационный номер заказа для которого было изготовлено изделие, '' - изделие в наличии",
   })
-  orderId?: string = ''
+  orderId?: Types.ObjectId
 
   @ApiProperty({ type: String, description: 'фото изделия' })
   photo?: string = ''
@@ -60,10 +61,10 @@ export class ProductEntity {
   size: string
 
   @ApiProperty({
-    type: String,
-    description: 'идентиифкационный номер нити которой прошито изделие',
+    type: SchemaTypes.ObjectId,
+    description: 'идентификационный номер нити которой прошито изделие',
   })
-  thread: string
+  thread: Types.ObjectId
 
   @ApiProperty({ type: String, description: 'название изделия' })
   title: string

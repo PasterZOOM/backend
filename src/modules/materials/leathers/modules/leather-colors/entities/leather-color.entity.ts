@@ -1,16 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 
 import { ELeatherColor } from './leather-colors.type'
 
 export class LeatherColorEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер цвета кожи' })
-  _id: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер цвета кожи' })
+  _id: Types.ObjectId
 
   @ApiProperty({
-    type: String,
-    description: 'идентификационный номер артикуля под которым выпускается данный цввет',
+    type: SchemaTypes.ObjectId,
+    description: 'идентификационный номер артикула под которым выпускается данный цвет',
   })
-  article: string
+  article: Types.ObjectId
 
   @ApiProperty({
     type: String,
@@ -30,7 +31,7 @@ export class LeatherColorEntity {
   @ApiProperty({
     enum: ELeatherColor,
     enumName: 'ELeatherColor',
-    description: 'к какой категории чветов относится цвет',
+    description: 'к какой категории цветов относится цвет',
   })
   value: string
 

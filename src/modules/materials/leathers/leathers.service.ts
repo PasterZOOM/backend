@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 
 import { CreateLeatherDto } from './dto/create-leather.dto'
 import { UpdateLeatherDto } from './dto/update-leather.dto'
@@ -21,17 +21,17 @@ export class LeathersService {
     return this.LeatherModel.find().exec()
   }
 
-  async findOne(id: string): Promise<LeatherEntity> {
+  async findOne(id: Types.ObjectId): Promise<LeatherEntity> {
     return this.LeatherModel.findById(id)
   }
 
-  async update(id: string, updateLeatherDto: UpdateLeatherDto): Promise<LeatherEntity> {
+  async update(id: Types.ObjectId, updateLeatherDto: UpdateLeatherDto): Promise<LeatherEntity> {
     await this.LeatherModel.findByIdAndUpdate(id, updateLeatherDto)
 
     return this.findOne(id)
   }
 
-  async remove(id: string): Promise<LeatherEntity> {
+  async remove(id: Types.ObjectId): Promise<LeatherEntity> {
     return this.LeatherModel.findByIdAndRemove(id)
   }
 }

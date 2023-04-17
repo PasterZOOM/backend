@@ -1,17 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 
 export class LeatherEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер кожи' })
-  _id: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер кожи' })
+  _id: Types.ObjectId
 
-  @ApiProperty({ type: String, description: 'идентификационный номер артикуля кожи' })
-  article: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер артикула кожи' })
+  article: Types.ObjectId
 
-  @ApiProperty({ type: String, description: 'идентификационный номер цвета кожи' })
-  color: string
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер цвета кожи' })
+  color: Types.ObjectId
 
-  @ApiProperty({ type: String, description: 'идентификационный номер фабрики производития кожи' })
-  factory: string
+  @ApiProperty({
+    type: SchemaTypes.ObjectId,
+    description: 'идентификационный номер фабрики производителя кожи',
+  })
+  factory: Types.ObjectId
 
   @ApiProperty({ type: String, description: 'толщина кожи' })
   thickness: string

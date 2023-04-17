@@ -1,15 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 import { ECountry, TCountry } from 'src/common/interfaces/country.type'
 
 export class LeatherFactoryEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер фабрики производителя кожи' })
-  _id: string
+  @ApiProperty({
+    type: SchemaTypes.ObjectId,
+    description: 'идентификационный номер фабрики производителя кожи',
+  })
+  _id: Types.ObjectId
 
   @ApiProperty({
-    type: [String],
-    description: 'идентификационные номера артикулей производимых фабрикой',
+    type: [SchemaTypes.ObjectId],
+    description: 'идентификационные номера артиклей производимых фабрикой',
   })
-  articles: string[]
+  articles: Types.ObjectId[]
 
   @ApiProperty({
     enum: ECountry,

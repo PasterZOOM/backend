@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 
 import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
 import { UpdateLeatherFactoryDto } from './dto/update-leather-factory.dto'
@@ -23,12 +23,12 @@ export class LeatherFactoriesService {
     return this.LeatherFactoryModel.find().sort().exec()
   }
 
-  async findOne(id: string): Promise<LeatherFactoryEntity> {
+  async findOne(id: Types.ObjectId): Promise<LeatherFactoryEntity> {
     return this.LeatherFactoryModel.findById(id)
   }
 
   async update(
-    id: string,
+    id: Types.ObjectId,
     updateLeatherFactoryDto: UpdateLeatherFactoryDto
   ): Promise<LeatherFactoryEntity> {
     await this.LeatherFactoryModel.findByIdAndUpdate(id, updateLeatherFactoryDto)
@@ -36,20 +36,20 @@ export class LeatherFactoriesService {
     return this.findOne(id)
   }
 
-  async remove(id: string): Promise<LeatherFactoryEntity> {
+  async remove(id: Types.ObjectId): Promise<LeatherFactoryEntity> {
     return this.LeatherFactoryModel.findByIdAndRemove(id)
   }
 
   async push(
-    id: string,
-    addToSet: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: string }
+    id: Types.ObjectId,
+    addToSet: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: Types.ObjectId }
   ): Promise<LeatherFactoryEntity> {
     return this.LeatherFactoryModel.findByIdAndUpdate(id, { $addToSet: addToSet })
   }
 
   async pull(
-    id: string,
-    pulled: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: string }
+    id: Types.ObjectId,
+    pulled: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: Types.ObjectId }
   ): Promise<LeatherFactoryEntity> {
     return this.LeatherFactoryModel.findByIdAndUpdate(id, { $pull: pulled })
   }

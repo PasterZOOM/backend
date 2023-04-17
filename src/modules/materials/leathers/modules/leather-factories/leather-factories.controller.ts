@@ -10,6 +10,7 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from 'src/modules/materials/leathers/modules/leather-articles/leather-articles.service'
 import { LeatherColorsService } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.service'
@@ -46,7 +47,7 @@ export class LeatherFactoriesController {
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
-  async findOne(@Param('id') id: string): Promise<
+  async findOne(@Param('id') id: Types.ObjectId): Promise<
     Omit<LeatherFactoryEntity, 'articles'> & {
       articles: Pick<LeatherArticleEntity, '_id' | 'title'>[]
     }
@@ -71,7 +72,7 @@ export class LeatherFactoriesController {
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateFactoryDto: UpdateLeatherFactoryDto
   ): Promise<
     Omit<LeatherFactoryEntity, 'articles'> & {
@@ -97,7 +98,7 @@ export class LeatherFactoriesController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<LeatherFactoryEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<LeatherFactoryEntity> {
     const factory = await this.leatherFactoriesService.findOne(id)
 
     await Promise.all(

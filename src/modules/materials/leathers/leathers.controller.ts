@@ -9,6 +9,7 @@ import {
   Post,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
 import { CreateLeatherDto } from './dto/create-leather.dto'
@@ -74,20 +75,20 @@ export class LeathersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<LeatherEntity> {
+  findOne(@Param('id') id: Types.ObjectId): Promise<LeatherEntity> {
     return this.leathersService.findOne(id)
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateLeatherDto: UpdateLeatherDto
   ): Promise<LeatherEntity> {
     return this.leathersService.update(id, updateLeatherDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<LeatherEntity> {
+  remove(@Param('id') id: Types.ObjectId): Promise<LeatherEntity> {
     return this.leathersService.remove(id)
   }
 }

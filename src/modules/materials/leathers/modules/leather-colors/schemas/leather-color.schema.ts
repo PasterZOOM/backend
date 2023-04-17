@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 
 import { LeatherColorEntity } from '../entities/leather-color.entity'
 import { ELeatherColor } from '../entities/leather-colors.type'
@@ -8,11 +8,8 @@ export type LeatherColorDocument = LeatherColor & Document
 
 @Schema()
 export class LeatherColor implements Omit<LeatherColorEntity, '_id'> {
-  @Prop({ default: '' })
-  article: string
-
-  @Prop({ default: '' })
-  factory: string
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  article: Types.ObjectId
 
   @Prop({ default: '' })
   code: string

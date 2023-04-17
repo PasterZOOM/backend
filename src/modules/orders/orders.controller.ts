@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { getOrderNumber } from 'src/common/utils/string/getOrderNumber'
 
@@ -21,8 +22,8 @@ export class OrdersController {
 
   @Post(':ownerId')
   async create(
-    @Param('ownerId') ownerId: string,
-    @Query('deadline') deadline: string,
+    @Param('ownerId') ownerId: Types.ObjectId,
+    @Query('deadline') deadline: Types.ObjectId,
     @Body() createOrderDto: Omit<CreateOrderDto, 'ownerId' | 'number' | 'date'> // TODO: удалить сумму, она будет рассчитываться исходя из стоимпости изделий
   ): Promise<OrderEntity> {
     try {
@@ -60,17 +61,20 @@ export class OrdersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<OrderEntity> {
+  findOne(@Param('id') id: Types.ObjectId): Promise<OrderEntity> {
     return this.ordersService.findOne(id)
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto): Promise<OrderEntity> {
+  update(
+    @Param('id') id: Types.ObjectId,
+    @Body() updateOrderDto: UpdateOrderDto
+  ): Promise<OrderEntity> {
     return this.ordersService.update(id, updateOrderDto)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<OrderEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<OrderEntity> {
     try {
       const order = await this.findOne(id)
       const owner = await this.personsService.findOne(order.ownerId)

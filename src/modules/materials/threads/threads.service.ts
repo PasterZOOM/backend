@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 
 import { CreateThreadDto } from './dto/create-thread.dto'
 import { UpdateThreadDto } from './dto/update-thread.dto'
@@ -21,17 +21,17 @@ export class ThreadsService {
     return this.ThreadModel.find().exec()
   }
 
-  async findOne(id: string): Promise<ThreadEntity> {
+  async findOne(id: Types.ObjectId): Promise<ThreadEntity> {
     return this.ThreadModel.findById(id)
   }
 
-  async update(id: string, updateThreadDto: UpdateThreadDto): Promise<ThreadEntity> {
+  async update(id: Types.ObjectId, updateThreadDto: UpdateThreadDto): Promise<ThreadEntity> {
     await this.ThreadModel.findByIdAndUpdate(id, updateThreadDto)
 
     return this.findOne(id)
   }
 
-  async remove(id: string): Promise<ThreadEntity> {
+  async remove(id: Types.ObjectId): Promise<ThreadEntity> {
     return this.ThreadModel.findByIdAndRemove(id)
   }
 }

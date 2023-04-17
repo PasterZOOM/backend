@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
-import { FilterQuery } from 'mongoose'
+import { FilterQuery, Types } from 'mongoose'
 import { v1 } from 'uuid'
 
 import { LeatherArticleEntity } from '../materials/leathers/modules/leather-articles/entities/leather-article.entity'
@@ -109,6 +109,7 @@ export class BasicProductsController {
       basicProducts.map(
         async ({
           category,
+          isPublished,
           description,
           costCurrency,
           cost,
@@ -124,6 +125,7 @@ export class BasicProductsController {
 
           return {
             assignments,
+            isPublished,
             title,
             _id,
             size,
@@ -142,13 +144,14 @@ export class BasicProductsController {
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(
-    @Param('id') id: string
+    @Param('id') id: Types.ObjectId
   ): Promise<
     Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
   > {
     const {
       assignments,
       leather,
+      isPublished,
       description,
       category,
       cost,
@@ -164,6 +167,7 @@ export class BasicProductsController {
 
     return {
       assignments,
+      isPublished,
       title,
       _id,
       size,
@@ -179,13 +183,14 @@ export class BasicProductsController {
 
   @Patch(':id') // TODO написать возвращаемый тип для swagger
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateBasicProductDto: UpdateBasicProductDto
   ): Promise<
     Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
   > {
     const {
       _id,
+      isPublished,
       description,
       title,
       photos,
@@ -202,6 +207,7 @@ export class BasicProductsController {
 
     return {
       assignments,
+      isPublished,
       title,
       _id,
       size,
@@ -216,13 +222,13 @@ export class BasicProductsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<BasicProductEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<BasicProductEntity> {
     return this.basicProductsService.remove(id)
   }
 
   @Put(':id/photo')
   async addPhoto(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() photo: { [key: string]: string[] }
   ): Promise<
     Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
@@ -241,6 +247,7 @@ export class BasicProductsController {
 
     const {
       _id,
+      isPublished,
       description,
       title,
       photos,
@@ -257,6 +264,7 @@ export class BasicProductsController {
 
     return {
       assignments,
+      isPublished,
       title,
       _id,
       size,
@@ -272,21 +280,26 @@ export class BasicProductsController {
 
   @Delete(':productId/photo/:photoId')
   async removePhoto(
-    @Param('productId') productId: string,
-    @Param('photoId') photoId: string
+    @Param('productId') productId: Types.ObjectId,
+    @Param('photoId') photoId: Types.ObjectId
   ): Promise<
     Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
   > {
     const product = await this.basicProductsService.findOne(productId)
 
     Object.keys(product.photos).forEach(key => {
-      const newArray = product.photos[key].filter(ph => ph._id !== photoId)
+      const newArray = product.photos[key].filter(ph => ph._id !== photoId.toString())
 
-      product.photos[key] = newArray.length ? newArray : undefined
+      if (newArray.length) {
+        product.photos[key] = newArray
+      } else {
+        delete product.photos[key]
+      }
     })
 
     const {
       _id,
+      isPublished,
       description,
       title,
       photos,
@@ -303,6 +316,7 @@ export class BasicProductsController {
 
     return {
       assignments,
+      isPublished,
       title,
       _id,
       size,

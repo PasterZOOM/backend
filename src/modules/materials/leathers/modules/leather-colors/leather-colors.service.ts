@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model } from 'mongoose'
+import { FilterQuery, Model, Types } from 'mongoose'
 
 import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { UpdateLeatherColorDto } from './dto/update-leather-color.dto'
@@ -14,7 +14,7 @@ export class LeatherColorsService {
   ) {}
 
   async create(
-    createLeatherColorDto: CreateLeatherColorDto & { article: string }
+    createLeatherColorDto: CreateLeatherColorDto & { article: Types.ObjectId }
   ): Promise<LeatherColorEntity> {
     const newLeatherColor = new this.LeatherColorsModel(createLeatherColorDto)
 
@@ -25,12 +25,12 @@ export class LeatherColorsService {
     return this.LeatherColorsModel.find(filter).sort().exec()
   }
 
-  async findOne(id: string): Promise<LeatherColorEntity> {
+  async findOne(id: Types.ObjectId): Promise<LeatherColorEntity> {
     return this.LeatherColorsModel.findById(id)
   }
 
   async update(
-    id: string,
+    id: Types.ObjectId,
     updateLeatherColorDto: UpdateLeatherColorDto
   ): Promise<LeatherColorEntity> {
     await this.LeatherColorsModel.findByIdAndUpdate(id, updateLeatherColorDto)
@@ -38,7 +38,7 @@ export class LeatherColorsService {
     return this.findOne(id)
   }
 
-  async remove(id: string): Promise<LeatherColorEntity> {
+  async remove(id: Types.ObjectId): Promise<LeatherColorEntity> {
     return this.LeatherColorsModel.findByIdAndRemove(id)
   }
 }

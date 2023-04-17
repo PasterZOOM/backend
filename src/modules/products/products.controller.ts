@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 import { ProductEntity } from 'src/modules/products/entities/product.entity'
 
 import { CreateProductDto } from './dto/create-product.dto'
@@ -22,20 +23,20 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ProductEntity> {
+  async findOne(@Param('id') id: Types.ObjectId): Promise<ProductEntity> {
     return this.productsService.findOne(id)
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateProductDto: UpdateProductDto
   ): Promise<ProductEntity> {
     return this.productsService.update(id, updateProductDto)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<ProductEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<ProductEntity> {
     return this.productsService.remove(id)
   }
 }

@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
 import { PersonEntity } from '../persons/entities/person.entity'
@@ -20,7 +21,7 @@ export class AddressesController {
 
   @Post(':ownerId')
   async create(
-    @Param('ownerId') ownerId: string,
+    @Param('ownerId') ownerId: Types.ObjectId,
     @Body() createAddressDto: CreateAddressDto
   ): Promise<AddressEntity> {
     try {
@@ -42,13 +43,13 @@ export class AddressesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<AddressEntity> {
+  async findOne(@Param('id') id: Types.ObjectId): Promise<AddressEntity> {
     return this.addressesService.findOne(id)
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateAddressDto: UpdateAddressDto
   ): Promise<AddressEntity> {
     return this.addressesService.update(id, updateAddressDto)
@@ -56,12 +57,14 @@ export class AddressesController {
 
   @Patch(':id/main')
   @ApiOkResponse({ type: PickType(PersonEntity, ['addressIds']) })
-  async makeAddressMain(@Param('id') id: string): Promise<{ addressIds: string[] }> {
+  async makeAddressMain(
+    @Param('id') id: Types.ObjectId
+  ): Promise<{ addressIds: Types.ObjectId[] }> {
     return this.personsService.makeAddressMain(id)
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<AddressEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<AddressEntity> {
     try {
       const address = await this.findOne(id)
       const owner = await this.personsService.findOne(address.ownerId)

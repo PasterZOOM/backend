@@ -1,12 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { SchemaTypes, Types } from 'mongoose'
 import { ECost } from 'src/common/interfaces/cost.type'
 import { PhotosType } from 'src/modules/basic-products/entities/basic-product.type'
 import { EPunchPitch } from 'src/modules/materials/common/materials.type'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
 
 export class BasicProductEntity {
-  @ApiProperty({ type: String, description: 'идентификационный номер базового изделия' })
-  _id: string
+  @ApiProperty({
+    type: SchemaTypes.ObjectId,
+    description: 'идентификационный номер базового изделия',
+  })
+  _id: Types.ObjectId
 
   @ApiProperty({
     type: () => [String],
@@ -35,10 +39,10 @@ export class BasicProductEntity {
   description: string
 
   @ApiProperty({
-    type: String,
+    type: SchemaTypes.ObjectId,
     description: 'идентификационный номер артикула кожи из которой сделано базовое изделие',
   })
-  leather: string
+  leather: Types.ObjectId
 
   @ApiProperty({ type: Object, description: 'массив назначений базового продукта' })
   photos: PhotosType
@@ -55,4 +59,7 @@ export class BasicProductEntity {
 
   @ApiProperty({ type: String, description: 'название изделия' })
   title: string
+
+  @ApiProperty({ type: String, description: 'опубликованное ли изделие' })
+  isPublished: boolean // TODO: отдавать неопубликованные только, если есть токен админа
 }

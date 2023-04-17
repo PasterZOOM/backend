@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 
 import { CreateThreadDto } from './dto/create-thread.dto'
 import { UpdateThreadDto } from './dto/update-thread.dto'
@@ -22,20 +23,20 @@ export class ThreadsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<ThreadEntity> {
+  findOne(@Param('id') id: Types.ObjectId): Promise<ThreadEntity> {
     return this.threadService.findOne(id)
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateThreadDto: UpdateThreadDto
   ): Promise<ThreadEntity> {
     return this.threadService.update(id, updateThreadDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<ThreadEntity> {
+  remove(@Param('id') id: Types.ObjectId): Promise<ThreadEntity> {
     return this.threadService.remove(id)
   }
 }

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document } from 'mongoose'
+import { Document, SchemaTypes, Types } from 'mongoose'
 import { TCountry } from 'src/common/interfaces/country.type'
 
 import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
@@ -8,8 +8,8 @@ export type LeatherFactoryDocument = LeatherFactory & Document
 
 @Schema()
 export class LeatherFactory implements Omit<LeatherFactoryEntity, '_id'> {
-  @Prop({ type: [String], default: [] })
-  articles: string[]
+  @Prop({ type: [SchemaTypes.ObjectId], default: [] })
+  articles: Types.ObjectId[]
 
   @Prop({ default: '' })
   country: TCountry

@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
+import { Types } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 
@@ -33,7 +34,7 @@ export class LeatherColorsController {
   @Post(':articleId')
   async create(
     @Body() createLeatherColorDto: CreateLeatherColorDto,
-    @Param('articleId') articleId: string
+    @Param('articleId') articleId: Types.ObjectId
   ): Promise<LeatherColorEntity> {
     try {
       const createdColor = await this.leatherColorsService.create({
@@ -52,7 +53,7 @@ export class LeatherColorsController {
   @Get()
   @ApiQuery({ name: '_id', required: false })
   async findAll(
-    @Query('_id') _id?: string[]
+    @Query('_id') _id?: Types.ObjectId[]
   ): Promise<Pick<LeatherColorEntity, '_id' | 'title' | 'photo'>[]> {
     const colors = await this.leatherColorsService.findAll(
       _id ? { $or: _id.map(_id => ({ _id })) } : undefined
@@ -62,7 +63,7 @@ export class LeatherColorsController {
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
-  async findOne(@Param('id') id: string): Promise<
+  async findOne(@Param('id') id: Types.ObjectId): Promise<
     Omit<LeatherColorEntity, 'article'> & {
       article: Pick<LeatherArticleEntity, '_id' | 'title'>
     }
@@ -85,7 +86,7 @@ export class LeatherColorsController {
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateLeatherColorDto: UpdateLeatherColorDto
   ): Promise<
     Omit<LeatherColorEntity, 'article'> & { article: Pick<LeatherArticleEntity, '_id' | 'title'> }
@@ -107,7 +108,7 @@ export class LeatherColorsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<LeatherColorEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<LeatherColorEntity> {
     try {
       const color = await this.leatherColorsService.findOne(id)
       const article = await this.leatherArticlesService.findOne(color.article)

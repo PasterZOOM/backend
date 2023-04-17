@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model } from 'mongoose'
+import { FilterQuery, Model, Types } from 'mongoose'
 
 import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
@@ -23,12 +23,12 @@ export class BasicProductsService {
     return this.BasicProductModel.find(filters)
   }
 
-  async findOne(id: string): Promise<BasicProductEntity> {
+  async findOne(id: Types.ObjectId): Promise<BasicProductEntity> {
     return this.BasicProductModel.findById(id)
   }
 
   async update(
-    id: string,
+    id: Types.ObjectId,
     updateBasicProductDto: UpdateBasicProductDto
   ): Promise<BasicProductEntity> {
     await this.BasicProductModel.findByIdAndUpdate(id, updateBasicProductDto)
@@ -36,7 +36,7 @@ export class BasicProductsService {
     return this.findOne(id)
   }
 
-  async remove(id: string): Promise<BasicProductEntity> {
+  async remove(id: Types.ObjectId): Promise<BasicProductEntity> {
     return this.BasicProductModel.findByIdAndRemove(id)
   }
 }
