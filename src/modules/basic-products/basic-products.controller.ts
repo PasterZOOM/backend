@@ -11,7 +11,7 @@ import { BasicProductsService } from './basic-products.service'
 import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
 import { BasicProductEntity } from './entities/basic-product.entity'
-import { EFilterKeys } from './entities/basic-product.type'
+import { EFilterKeys, ProductPhotoType } from './entities/basic-product.type'
 import { BasicProductDocument } from './schemas/basic-product.schema'
 
 @ApiTags('Basic-products')
@@ -43,31 +43,27 @@ export class BasicProductsController {
       Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
     >[]
   > {
-    const filters = async (): Promise<FilterQuery<BasicProductDocument>> => {
-      const filters: Partial<Record<EFilterKeys, string[] | undefined>> = {}
+    const colors = leatherColors
+      ? (
+          await Promise.all(
+            leatherColors.map(async value => {
+              const colors = await this.leatherColorsService.findAll({ value })
 
-      Object.entries({
+              return colors.map(color => color._id).join(',')
+            })
+          )
+        )
+          .map(color => color.split(','))
+          .flat()
+      : undefined
+
+    const filters = async (): Promise<FilterQuery<BasicProductDocument>> => {
+      const filters: Partial<Record<EFilterKeys, string[] | undefined>> = {
         [EFilterKeys.ASSIGNMENTS]: assignments,
         [EFilterKeys.CATEGORIES]: categories,
-        [EFilterKeys.LEATHER_COLORS]: leatherColors
-          ? await Promise.all(
-              leatherColors.map(async value => {
-                const colors = await this.leatherColorsService.findAll({ value })
-
-                return colors.map(color => color.article).join(',')
-              })
-            )
-          : undefined,
+        [EFilterKeys.LEATHER_COLORS]: colors,
         [EFilterKeys.LEATHERS]: leathers,
-      }).forEach(([key, value]) => {
-        if (value) {
-          if (key === 'leatherColors') {
-            filters[key] = value.join(',').split(',')
-          } else {
-            filters[key] = value
-          }
-        }
-      })
+      }
 
       let categoriesArray = []
       let leathersArray = []
@@ -90,14 +86,20 @@ export class BasicProductsController {
         assignmentsArray = filters.assignments.map(assignments => ({ assignments }))
       }
       if (filters.leatherColors) {
-        colorsArray = filters.leatherColors.map(color => ({ [color]: true }))
+        colorsArray = filters.leatherColors.map(color => {
+          const key = `photos.${color}`
+
+          return {
+            [key]: { $exists: true },
+          }
+        })
       }
 
       return {
         $and: [
           categoriesArray.length ? { $or: categoriesArray } : {},
           leathersArray.length ? { $or: leathersArray } : {},
-          assignmentsArray.length ? { $and: assignmentsArray } : {}, // TODO: проработать этот момент с UX, and или or
+          assignmentsArray.length ? { $or: assignmentsArray } : {},
           colorsArray.length ? { $or: colorsArray } : {},
         ],
       }
@@ -105,41 +107,66 @@ export class BasicProductsController {
 
     const basicProducts = await this.basicProductsService.findAll(await filters())
 
-    return Promise.all(
-      basicProducts.map(
-        async ({
-          category,
-          isPublished,
-          description,
-          costCurrency,
-          cost,
-          leather,
-          assignments,
-          punchPitch,
-          photos,
-          _id,
-          size,
-          title,
-        }) => {
-          const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
-
-          return {
-            assignments,
+    return (
+      await Promise.all(
+        basicProducts.map(
+          async ({
+            category,
             isPublished,
-            title,
-            _id,
-            size,
+            description,
+            costCurrency,
+            cost,
+            leather,
+            assignments,
             punchPitch,
             photos,
-            costCurrency,
-            description,
-            category,
-            cost,
-            leather: { _id: leather, title: leatherTitle },
+            _id,
+            size,
+            title,
+          }) => {
+            const filteredPhotos: Record<string, ProductPhotoType[]> = {}
+            const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
+
+            await Promise.all(
+              Object.entries(photos).map(async ([colorId, photos]) => {
+                const pushProductColor = async (): Promise<void> => {
+                  const { _id, photo, title } = await this.leatherColorsService.findOne(
+                    colorId as unknown as Types.ObjectId
+                  )
+
+                  productColors.push({ _id, photo, title })
+                }
+
+                if (colors && colors.includes(colorId)) {
+                  filteredPhotos[colorId] = photos
+                  await pushProductColor()
+                } else if (!colors) {
+                  await pushProductColor()
+                }
+              })
+            )
+
+            const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
+
+            return {
+              assignments,
+              isPublished,
+              title,
+              _id,
+              size,
+              punchPitch,
+              costCurrency,
+              description,
+              category,
+              cost,
+              leather: { _id: leather, title: leatherTitle },
+              photos: colors ? filteredPhotos : photos,
+              productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
+            }
           }
-        }
+        )
       )
-    )
+    ).filter(el => (colors ? el.productColors.length !== 0 : true))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
