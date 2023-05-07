@@ -14,7 +14,7 @@ import {
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
-import { LeatherFactoryResponse } from 'src/modules/materials/leathers/modules/leather-articles/dto/leather-article-responce.dto'
+import { LeatherArticleResponse } from 'src/modules/materials/leathers/modules/leather-articles/dto/leather-article-responce.dto'
 import { LeatherColorEntity } from 'src/modules/materials/leathers/modules/leather-colors/entities/leather-color.entity'
 import { LeatherFactoryEntity } from 'src/modules/materials/leathers/modules/leather-factories/entities/leather-factory.entity'
 
@@ -37,7 +37,7 @@ export class LeatherArticlesController {
 
   @Post(':factoryId')
   async create(
-    @Body() { title, description }: LeatherFactoryResponse,
+    @Body() { title, description }: LeatherArticleResponse,
     @Param('factoryId') factoryId: Types.ObjectId,
     @Headers() { 'accept-language': locale }
   ): Promise<{ _id: Types.ObjectId; title: string }> {
@@ -104,7 +104,7 @@ export class LeatherArticlesController {
   @Patch(':id') // TODO сделать возможность изменять фабрику для артикула (так же реализовать это на фронте)
   async update(
     @Param('id') id: Types.ObjectId,
-    @Body() updateLeatherArticleDto: Partial<LeatherFactoryResponse>,
+    @Body() updateLeatherArticleDto: Partial<LeatherArticleResponse>,
     @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
   ): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
