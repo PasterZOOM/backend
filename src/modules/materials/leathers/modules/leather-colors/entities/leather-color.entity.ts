@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { SchemaTypes, Types } from 'mongoose'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 
 import { ELeatherColor } from './leather-colors.type'
 
@@ -23,10 +24,10 @@ export class LeatherColorEntity {
   photo: string
 
   @ApiProperty({
-    type: String,
+    type: LocaleFieldEntity,
     description: 'название цвета',
   })
-  title: string
+  title: LocaleFieldEntity
 
   @ApiProperty({
     enum: ELeatherColor,
@@ -35,6 +36,6 @@ export class LeatherColorEntity {
   })
   value: string
 
-  @ApiProperty({ type: String, description: 'описание цвета' })
-  description: string
+  @ApiProperty({ type: LocaleFieldEntity, description: 'описание цвета' })
+  description: LocaleFieldEntity
 }

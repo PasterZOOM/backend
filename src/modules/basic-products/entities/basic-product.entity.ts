@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { SchemaTypes, Types } from 'mongoose'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECost } from 'src/common/interfaces/cost.type'
 import { PhotosType } from 'src/modules/basic-products/entities/basic-product.type'
 import { EPunchPitch } from 'src/modules/materials/common/materials.type'
@@ -35,8 +36,8 @@ export class BasicProductEntity {
   })
   costCurrency: ECost
 
-  @ApiProperty({ type: String, description: 'описание базового изделия' })
-  description: string
+  @ApiProperty({ type: LocaleFieldEntity, description: 'описание базового изделия' })
+  description: LocaleFieldEntity
 
   @ApiProperty({
     type: SchemaTypes.ObjectId,
@@ -54,11 +55,11 @@ export class BasicProductEntity {
   })
   punchPitch: EPunchPitch
 
-  @ApiProperty({ type: String, description: 'размер изделия' })
-  size: string
+  @ApiProperty({ type: LocaleFieldEntity, description: 'размер изделия' })
+  size: LocaleFieldEntity
 
-  @ApiProperty({ type: String, description: 'название изделия' })
-  title: string
+  @ApiProperty({ type: LocaleFieldEntity, description: 'название изделия' })
+  title: LocaleFieldEntity
 
   @ApiProperty({ type: String, description: 'опубликованное ли изделие' })
   isPublished: boolean // TODO: отдавать неопубликованные только, если есть токен админа

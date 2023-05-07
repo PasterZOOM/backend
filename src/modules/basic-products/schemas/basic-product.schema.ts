@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, SchemaTypes, Types } from 'mongoose'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECost } from 'src/common/interfaces/cost.type'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
 
@@ -14,14 +15,11 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ type: [String], default: [] })
   assignments: EProductAssignment[]
 
-  @Prop({ default: '' })
-  comment: string
-
   @Prop({ type: Number })
   cost: number
 
-  @Prop({ default: '' })
-  description: string
+  @Prop({ default: {} })
+  description: LocaleFieldEntity
 
   @Prop({ type: SchemaTypes.ObjectId, default: '' })
   leather: Types.ObjectId
@@ -32,11 +30,11 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ default: ECost.EUR })
   costCurrency: ECost
 
-  @Prop({ default: '' })
-  size: string
+  @Prop({ default: {} })
+  size: LocaleFieldEntity
 
-  @Prop({ default: '' })
-  title: string
+  @Prop({ default: {} })
+  title: LocaleFieldEntity
 
   @Prop({ default: EProductCategory.WATCH_STRAP })
   category: EProductCategory

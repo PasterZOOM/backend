@@ -4,10 +4,12 @@ import {
   Delete,
   forwardRef,
   Get,
+  Headers,
   Inject,
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
@@ -37,19 +39,20 @@ export class LeatherArticlesController {
   @Post(':factoryId')
   async create(
     @Body() createLeatherArticleDto: CreateLeatherArticleDto,
-    @Param('factoryId') factoryId: Types.ObjectId
-  ): Promise<LeatherArticleEntity> {
+    @Param('factoryId') factoryId: Types.ObjectId,
+    @Headers() { 'accept-language': locale }
+  ): Promise<Pick<LeatherArticleEntity, '_id' | 'title'>> {
     try {
       const factory = await this.leatherFactoriesService.findOne(factoryId)
 
-      const createdArticle = await this.leatherArticlesService.create({
+      const { _id, title } = await this.leatherArticlesService.create({
         ...createLeatherArticleDto,
         factory: factoryId,
       })
 
-      await this.leatherFactoriesService.push(factory._id, { articles: createdArticle._id })
+      await this.leatherFactoriesService.push(factory._id, { articles: _id })
 
-      return createdArticle
+      return { _id, title: title[locale] }
     } catch (e) {
       throw new BadIdException('factory', e)
     }
@@ -60,15 +63,19 @@ export class LeatherArticlesController {
     type: [PickType(LeatherArticleEntity, ['_id', 'title'])],
   })
   async findAll(
-    filter: FilterQuery<LeatherArticleEntity>
+    @Headers() { 'accept-language': locale },
+    @Query('filter') filter: FilterQuery<LeatherArticleEntity>
   ): Promise<Pick<LeatherArticleEntity, '_id' | 'title'>[]> {
     const articles = await this.leatherArticlesService.findAll(filter)
 
-    return articles.map(({ title, _id }) => ({ title, _id }))
+    return articles.map(({ title, _id }) => ({ title: title[locale], _id }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
-  async findOne(@Param('id') id: Types.ObjectId): Promise<
+  async findOne(
+    @Param('id') id: Types.ObjectId,
+    @Headers() { 'accept-language': locale }
+  ): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
       factory: Pick<LeatherFactoryEntity, '_id' | 'title'>
@@ -81,14 +88,14 @@ export class LeatherArticlesController {
 
     return {
       _id,
-      description,
-      title,
-      factory: { _id: factory, title: factoryTitle },
+      description: description[locale],
+      title: title[locale],
+      factory: { _id: factory, title: factoryTitle[locale] },
       colors: await Promise.all(
         colors.map(async colorId => {
           const { _id, title } = await this.leatherColorService.findOne(colorId)
 
-          return { _id, title }
+          return { _id, title: title[locale] }
         })
       ),
     }
@@ -97,7 +104,8 @@ export class LeatherArticlesController {
   @Patch(':id') // TODO сделать возможность изменять фабрику для артикула (так же реализовать это на фронте)
   async update(
     @Param('id') id: Types.ObjectId,
-    @Body() updateLeatherArticleDto: UpdateLeatherArticleDto
+    @Body() updateLeatherArticleDto: UpdateLeatherArticleDto,
+    @Headers() { 'accept-language': locale }
   ): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
@@ -113,21 +121,21 @@ export class LeatherArticlesController {
 
     return {
       _id,
-      description,
-      title,
-      factory: { _id: factory, title: factoryTitle },
+      description: description[locale],
+      title: title[locale],
+      factory: { _id: factory, title: factoryTitle[locale] },
       colors: await Promise.all(
         colors.map(async colorId => {
           const { _id, title } = await this.leatherColorService.findOne(colorId)
 
-          return { _id, title }
+          return { _id, title: title[locale] }
         })
       ),
     }
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: Types.ObjectId): Promise<LeatherArticleEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<void> {
     try {
       const article = await this.leatherArticlesService.findOne(id)
       const factory = await this.leatherFactoriesService.findOne(article.factory)
@@ -137,7 +145,7 @@ export class LeatherArticlesController {
       }
       await Promise.all(article.colors.map(color => this.leatherColorService.remove(color)))
 
-      return this.leatherArticlesService.remove(id)
+      await this.leatherArticlesService.remove(id)
     } catch (e) {
       throw new BadIdException('address', e)
     }

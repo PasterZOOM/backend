@@ -4,6 +4,7 @@ import {
   Delete,
   forwardRef,
   Get,
+  Headers,
   Inject,
   Param,
   Patch,
@@ -34,17 +35,18 @@ export class LeatherColorsController {
   @Post(':articleId')
   async create(
     @Body() createLeatherColorDto: CreateLeatherColorDto,
-    @Param('articleId') articleId: Types.ObjectId
-  ): Promise<LeatherColorEntity> {
+    @Param('articleId') articleId: Types.ObjectId,
+    @Headers() { 'accept-language': locale }
+  ): Promise<Pick<LeatherColorEntity, '_id' | 'title' | 'photo'>> {
     try {
-      const createdColor = await this.leatherColorsService.create({
+      const { title, _id, photo } = await this.leatherColorsService.create({
         ...createLeatherColorDto,
         article: articleId,
       })
 
-      await this.leatherArticlesService.push(articleId, { colors: createdColor._id })
+      await this.leatherArticlesService.push(articleId, { colors: _id })
 
-      return createdColor
+      return { title: title[locale], _id, photo }
     } catch (e) {
       throw new BadIdException('factory', e)
     }
@@ -53,17 +55,21 @@ export class LeatherColorsController {
   @Get()
   @ApiQuery({ name: '_id', required: false })
   async findAll(
+    @Headers() { 'accept-language': locale },
     @Query('_id') _id?: Types.ObjectId[]
   ): Promise<Pick<LeatherColorEntity, '_id' | 'title' | 'photo'>[]> {
     const colors = await this.leatherColorsService.findAll(
       _id ? { $or: _id.map(_id => ({ _id })) } : undefined
     )
 
-    return colors.map(({ title, _id, photo }) => ({ title, _id, photo }))
+    return colors.map(({ title, _id, photo }) => ({ title: title[locale], _id, photo }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
-  async findOne(@Param('id') id: Types.ObjectId): Promise<
+  async findOne(
+    @Param('id') id: Types.ObjectId,
+    @Headers() { 'accept-language': locale }
+  ): Promise<
     Omit<LeatherColorEntity, 'article'> & {
       article: Pick<LeatherArticleEntity, '_id' | 'title'>
     }
@@ -78,16 +84,17 @@ export class LeatherColorsController {
       photo,
       code,
       value,
-      title,
-      description,
-      article: { _id: article, title: articleTitle },
+      title: title[locale],
+      description: description[locale],
+      article: { _id: article, title: articleTitle[locale] },
     }
   }
 
   @Patch(':id')
   async update(
     @Param('id') id: Types.ObjectId,
-    @Body() updateLeatherColorDto: UpdateLeatherColorDto
+    @Body() updateLeatherColorDto: UpdateLeatherColorDto,
+    @Headers() { 'accept-language': locale }
   ): Promise<
     Omit<LeatherColorEntity, 'article'> & { article: Pick<LeatherArticleEntity, '_id' | 'title'> }
   > {
@@ -98,17 +105,17 @@ export class LeatherColorsController {
 
     return {
       _id,
-      description,
-      title,
       value,
       code,
       photo,
-      article: { _id: article, title: articleTitle },
+      title: title[locale],
+      description: description[locale],
+      article: { _id: article, title: articleTitle[locale] },
     }
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: Types.ObjectId): Promise<LeatherColorEntity> {
+  async remove(@Param('id') id: Types.ObjectId): Promise<void> {
     try {
       const color = await this.leatherColorsService.findOne(id)
       const article = await this.leatherArticlesService.findOne(color.article)
@@ -117,7 +124,7 @@ export class LeatherColorsController {
         await this.leatherArticlesService.pull(article._id, { colors: id })
       }
 
-      return this.leatherColorsService.remove(id)
+      await this.leatherColorsService.remove(id)
     } catch (e) {
       throw new BadIdException('address', e)
     }

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, SchemaTypes, Types } from 'mongoose'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 
 import { LeatherArticleEntity } from '../entities/leather-article.entity'
 
@@ -10,14 +11,14 @@ export class LeatherArticle implements Omit<LeatherArticleEntity, '_id'> {
   @Prop({ type: [SchemaTypes.ObjectId], default: [] })
   colors: Types.ObjectId[]
 
-  @Prop({ default: '' })
-  description: string
+  @Prop({ default: {} })
+  description: LocaleFieldEntity
 
   @Prop({ type: SchemaTypes.ObjectId, default: '' })
   factory: Types.ObjectId
 
-  @Prop({ default: '' })
-  title: string
+  @Prop({ default: {} })
+  title: LocaleFieldEntity
 }
 
 export const LeatherArticleSchema = SchemaFactory.createForClass(LeatherArticle)

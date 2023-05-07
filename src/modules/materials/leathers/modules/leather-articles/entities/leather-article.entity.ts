@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { SchemaTypes, Types } from 'mongoose'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 
 export class LeatherArticleEntity {
-  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер артикуля кожи' })
+  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер артикула кожи' })
   _id: Types.ObjectId
 
   @ApiProperty({
@@ -11,8 +12,8 @@ export class LeatherArticleEntity {
   })
   colors: Types.ObjectId[]
 
-  @ApiProperty({ type: String, description: 'описание артикула' })
-  description?: string = ''
+  @ApiProperty({ type: LocaleFieldEntity, description: 'описание артикула' })
+  description: LocaleFieldEntity
 
   @ApiProperty({
     type: SchemaTypes.ObjectId,
@@ -20,6 +21,6 @@ export class LeatherArticleEntity {
   })
   factory: Types.ObjectId
 
-  @ApiProperty({ type: String, description: 'название артикула' })
-  title: string
+  @ApiProperty({ type: LocaleFieldEntity, description: 'название артикула' })
+  title: LocaleFieldEntity
 }

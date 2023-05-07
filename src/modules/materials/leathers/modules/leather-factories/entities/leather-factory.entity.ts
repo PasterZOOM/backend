@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { SchemaTypes, Types } from 'mongoose'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECountry, TCountry } from 'src/common/interfaces/country.type'
 
 export class LeatherFactoryEntity {
@@ -22,9 +23,9 @@ export class LeatherFactoryEntity {
   })
   country: TCountry
 
-  @ApiProperty({ type: String, description: 'описание фабрики' })
-  description?: string = ''
+  @ApiProperty({ type: LocaleFieldEntity, description: 'описание фабрики' })
+  description: LocaleFieldEntity
 
-  @ApiProperty({ type: String, description: 'название фабрики' })
-  title: string
+  @ApiProperty({ type: LocaleFieldEntity, description: 'название фабрики' })
+  title: LocaleFieldEntity
 }

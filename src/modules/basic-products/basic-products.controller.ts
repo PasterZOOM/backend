@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
 import { v1 } from 'uuid'
@@ -24,8 +35,13 @@ export class BasicProductsController {
   ) {}
 
   @Post()
-  async create(@Body() createBasicProductDto: CreateBasicProductDto): Promise<BasicProductEntity> {
-    return this.basicProductsService.create(createBasicProductDto)
+  async create(
+    @Body() createBasicProductDto: CreateBasicProductDto,
+    @Headers() { 'accept-language': locale }
+  ): Promise<Pick<BasicProductEntity, '_id' | 'title'>> {
+    const { _id, title } = await this.basicProductsService.create(createBasicProductDto)
+
+    return { _id, title: title[locale] }
   }
 
   @Get() // TODO написать возвращаемый тип для swagger
@@ -34,13 +50,17 @@ export class BasicProductsController {
   @ApiQuery({ name: EFilterKeys.LEATHER_COLORS, required: false })
   @ApiQuery({ name: EFilterKeys.LEATHERS, required: false })
   async findAll(
+    @Headers() { 'accept-language': locale },
     @Query(EFilterKeys.ASSIGNMENTS) assignments?: string[],
     @Query(EFilterKeys.CATEGORIES) categories?: string[],
     @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[],
     @Query(EFilterKeys.LEATHERS) leathers?: string[]
   ): Promise<
     Awaited<
-      Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
+      Omit<BasicProductEntity, 'leather'> & {
+        leather: Pick<LeatherArticleEntity, '_id' | 'title'>
+        productColors: { _id: Types.ObjectId; photo: string; title: string }[]
+      }
     >[]
   > {
     const colors = leatherColors
@@ -76,7 +96,8 @@ export class BasicProductsController {
       if (filters.leathers) {
         leathersArray = await Promise.all(
           filters.leathers.map(async leather => {
-            const { _id } = await this.leatherArticlesService.find({ title: leather })
+            const key = `title.${locale}`
+            const { _id } = await this.leatherArticlesService.find({ [key]: leather })
 
             return { leather: _id }
           })
@@ -134,7 +155,7 @@ export class BasicProductsController {
                     colorId as unknown as Types.ObjectId
                   )
 
-                  productColors.push({ _id, photo, title })
+                  productColors.push({ _id, photo, title: title[locale] })
                 }
 
                 if (colors && colors.includes(colorId)) {
@@ -151,15 +172,15 @@ export class BasicProductsController {
             return {
               assignments,
               isPublished,
-              title,
               _id,
-              size,
               punchPitch,
               costCurrency,
-              description,
               category,
               cost,
-              leather: { _id: leather, title: leatherTitle },
+              size: size[locale],
+              title: title[locale],
+              description: description[locale],
+              leather: { _id: leather, title: leatherTitle[locale] },
               photos: colors ? filteredPhotos : photos,
               productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
             }
@@ -171,9 +192,13 @@ export class BasicProductsController {
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(
+    @Headers() { 'accept-language': locale },
     @Param('id') id: Types.ObjectId
   ): Promise<
-    Omit<BasicProductEntity, 'leather'> & { leather: Pick<LeatherArticleEntity, '_id' | 'title'> }
+    Omit<BasicProductEntity, 'leather'> & {
+      leather: Pick<LeatherArticleEntity, '_id' | 'title'>
+      productColors: { _id: Types.ObjectId; photo: string; title: string }[]
+    }
   > {
     const {
       assignments,
@@ -190,21 +215,33 @@ export class BasicProductsController {
       title,
     } = await this.basicProductsService.findOne(id)
 
+    const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
+
+    await Promise.all(
+      Object.keys(photos).map(async colorId => {
+        const { _id, photo, title } = await this.leatherColorsService.findOne(
+          colorId as unknown as Types.ObjectId
+        )
+
+        productColors.push({ _id, photo, title: title[locale] })
+      })
+    )
     const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
 
     return {
       assignments,
       isPublished,
-      title,
       _id,
-      size,
       punchPitch,
       photos,
       costCurrency,
-      description,
       category,
       cost,
-      leather: { _id: leather, title: leatherTitle },
+      size: size[locale],
+      title: title[locale],
+      description: description[locale],
+      leather: { _id: leather, title: leatherTitle[locale] },
+      productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
     }
   }
 
@@ -249,12 +286,13 @@ export class BasicProductsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: Types.ObjectId): Promise<BasicProductEntity> {
-    return this.basicProductsService.remove(id)
+  async remove(@Param('id') id: Types.ObjectId): Promise<void> {
+    await this.basicProductsService.remove(id)
   }
 
   @Put(':id/photo')
   async addPhoto(
+    @Headers() { 'accept-language': locale },
     @Param('id') id: Types.ObjectId,
     @Body() photo: { [key: string]: string[] }
   ): Promise<
@@ -292,21 +330,22 @@ export class BasicProductsController {
     return {
       assignments,
       isPublished,
-      title,
       _id,
-      size,
       punchPitch,
       photos,
       costCurrency,
-      description,
       category,
       cost,
-      leather: { _id: leather, title: leatherTitle },
+      size: size[locale],
+      title: title[locale],
+      description: description[locale],
+      leather: { _id: leather, title: leatherTitle[locale] },
     }
   }
 
   @Delete(':productId/photo/:photoId')
   async removePhoto(
+    @Headers() { 'accept-language': locale },
     @Param('productId') productId: Types.ObjectId,
     @Param('photoId') photoId: Types.ObjectId
   ): Promise<
@@ -344,16 +383,16 @@ export class BasicProductsController {
     return {
       assignments,
       isPublished,
-      title,
       _id,
-      size,
       punchPitch,
       photos,
       costCurrency,
-      description,
       category,
       cost,
-      leather: { _id: leather, title: leatherTitle },
+      size: size[locale],
+      title: title[locale],
+      description: description[locale],
+      leather: { _id: leather, title: leatherTitle[locale] },
     }
   }
 }
