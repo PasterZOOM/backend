@@ -43,10 +43,7 @@ export class LeatherFactoriesController {
       description: { en: '', ru: '', [locale]: description },
     })
 
-    return {
-      _id,
-      title,
-    }
+    return { _id, title }
   }
 
   @Get()
@@ -109,10 +106,11 @@ export class LeatherFactoriesController {
       country,
     } = await this.leatherFactoriesService.update(id, {
       country: updateFactoryDto.country,
-      title: updateFactoryDto.title ? { ...title, [locale]: updateFactoryDto.title } : undefined,
-      description: updateFactoryDto.description
-        ? { ...description, [locale]: updateFactoryDto.description }
-        : undefined,
+      title: updateFactoryDto.title && { ...title, [locale]: updateFactoryDto.title },
+      description: updateFactoryDto.description && {
+        ...description,
+        [locale]: updateFactoryDto.description,
+      },
     })
 
     return {

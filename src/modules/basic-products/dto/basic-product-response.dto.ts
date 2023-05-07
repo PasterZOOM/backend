@@ -1,18 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { SchemaTypes, Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECost } from 'src/common/interfaces/cost.type'
-import { PhotosType } from 'src/modules/basic-products/entities/basic-product.type'
 import { EPunchPitch } from 'src/modules/materials/common/materials.type'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
 
-export class BasicProductEntity {
-  @ApiProperty({
-    type: SchemaTypes.ObjectId,
-    description: 'идентификационный номер базового изделия',
-  })
-  _id: Types.ObjectId
-
+export class BasicProductResponse {
   @ApiProperty({
     type: () => [String],
     description: 'массив назначений базового продукта',
@@ -36,17 +28,14 @@ export class BasicProductEntity {
   })
   costCurrency: ECost
 
-  @ApiProperty({ type: LocaleFieldEntity, description: 'описание базового изделия' })
-  description: LocaleFieldEntity
+  @ApiProperty({ type: String, description: 'описание базового изделия' })
+  description: string
 
   @ApiProperty({
     type: SchemaTypes.ObjectId,
     description: 'идентификационный номер артикула кожи из которой сделано базовое изделие',
   })
   leather: Types.ObjectId
-
-  @ApiProperty({ type: Object, description: 'объект с фотографиями базового продукта' })
-  photos: PhotosType
 
   @ApiProperty({
     enum: EPunchPitch,
@@ -55,12 +44,9 @@ export class BasicProductEntity {
   })
   punchPitch: EPunchPitch
 
-  @ApiProperty({ type: LocaleFieldEntity, description: 'размер изделия' })
-  size: LocaleFieldEntity
+  @ApiProperty({ type: String, description: 'размер изделия' })
+  size: string
 
-  @ApiProperty({ type: LocaleFieldEntity, description: 'название изделия' })
-  title: LocaleFieldEntity
-
-  @ApiProperty({ type: String, description: 'опубликованное ли изделие' })
-  isPublished: boolean // TODO: отдавать неопубликованные только, если есть токен админа
+  @ApiProperty({ type: String, description: 'название изделия' })
+  title: string
 }
