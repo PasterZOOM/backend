@@ -18,7 +18,6 @@ import { LeatherArticlesService } from 'src/modules/materials/leathers/modules/l
 import { LeatherColorsService } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.service'
 import { LeatherFactoryResponse } from 'src/modules/materials/leathers/modules/leather-factories/dto/leather-factory-response.dto'
 
-import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
 import { LeatherFactoryEntity } from './entities/leather-factory.entity'
 import { LeatherFactoriesService } from './leather-factories.service'
 
@@ -38,12 +37,11 @@ export class LeatherFactoriesController {
     @Body() { country, title, description }: LeatherFactoryResponse,
     @Headers() { 'accept-language': locale }
   ): Promise<{ _id: Types.ObjectId; title: string }> {
-    const createFactoryDto: CreateLeatherFactoryDto = {
+    const { _id } = await this.leatherFactoriesService.create({
       country,
       title: { en: '', ru: '', [locale]: title },
       description: { en: '', ru: '', [locale]: description },
-    }
-    const { _id } = await this.leatherFactoriesService.create(createFactoryDto)
+    })
 
     return {
       _id,
