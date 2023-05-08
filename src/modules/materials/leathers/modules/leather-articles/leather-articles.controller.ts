@@ -37,7 +37,7 @@ export class LeatherArticlesController {
 
   @Post(':factoryId')
   async create(
-    @Body() { title, description }: LeatherArticleResponse,
+    @Body() { title, description, ...createLeatherArticle }: LeatherArticleResponse,
     @Param('factoryId') factoryId: Types.ObjectId,
     @Headers() { 'accept-language': locale }
   ): Promise<{ _id: Types.ObjectId; title: string }> {
@@ -48,6 +48,7 @@ export class LeatherArticlesController {
         title: { en: '', ru: '', [locale]: title },
         description: { en: '', ru: '', [locale]: description },
         factory: factoryId,
+        ...createLeatherArticle,
       })
 
       await this.leatherFactoriesService.push(factory._id, { articles: _id })
@@ -60,7 +61,7 @@ export class LeatherArticlesController {
 
   @Get()
   @ApiOkResponse({
-    type: [PickType(LeatherArticleEntity, ['_id', 'title'])],
+    type: [PickType(LeatherArticleEntity, ['_id', 'title', 'value'])],
   })
   async findAll(
     @Headers() { 'accept-language': locale },
@@ -68,7 +69,7 @@ export class LeatherArticlesController {
   ): Promise<{ _id: Types.ObjectId; title: string }[]> {
     const articles = await this.leatherArticlesService.findAll(filter)
 
-    return articles.map(({ title, _id }) => ({ title: title[locale], _id }))
+    return articles.map(({ title, _id, value }) => ({ title: title[locale], _id, value }))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
@@ -81,13 +82,13 @@ export class LeatherArticlesController {
       factory: Pick<LeatherFactoryEntity, '_id' | 'title'>
     }
   > {
-    const { _id, description, factory, title, colors } = await this.leatherArticlesService.findOne(
-      id
-    )
+    const { _id, description, factory, title, colors, value } =
+      await this.leatherArticlesService.findOne(id)
     const { title: factoryTitle } = await this.leatherFactoriesService.findOne(factory)
 
     return {
       _id,
+      value,
       description: description[locale],
       title: title[locale],
       factory: { _id: factory, title: factoryTitle[locale] },
@@ -104,17 +105,16 @@ export class LeatherArticlesController {
   @Patch(':id') // TODO сделать возможность изменять фабрику для артикула (так же реализовать это на фронте)
   async update(
     @Param('id') id: Types.ObjectId,
-    @Body() updateLeatherArticleDto: Partial<LeatherArticleResponse>,
+    @Body() { value, ...updateLeatherArticleDto }: Partial<LeatherArticleResponse>,
     @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
-  ): Promise<
-    Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
-      _id: Types.ObjectId
-      title: string
-      description: string
-      factory: { _id: Types.ObjectId; title: string }
-      colors: { _id: Types.ObjectId; title: string }[]
-    }
-  > {
+  ): Promise<{
+    _id: Types.ObjectId
+    title: string
+    description: string
+    value: string
+    factory: { _id: Types.ObjectId; title: string }
+    colors: { _id: Types.ObjectId; title: string }[]
+  }> {
     const { description, title } = await this.leatherArticlesService.findOne(id)
     const {
       _id,
@@ -122,7 +122,9 @@ export class LeatherArticlesController {
       colors,
       description: { [locale]: newDescription },
       factory,
+      value: newValue,
     } = await this.leatherArticlesService.update(id, {
+      value,
       title: updateLeatherArticleDto.title && { ...title, [locale]: updateLeatherArticleDto.title },
       description: updateLeatherArticleDto.description && {
         ...description,
@@ -134,6 +136,7 @@ export class LeatherArticlesController {
 
     return {
       _id,
+      value: newValue,
       description: newDescription,
       title: newTitle,
       factory: { _id: factory, title: factoryTitle[locale] },

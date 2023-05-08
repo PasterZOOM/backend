@@ -102,9 +102,8 @@ export class BasicProductsController {
       }
       if (filters.leathers) {
         leathersArray = await Promise.all(
-          filters.leathers.map(async leather => {
-            const key = `title.${locale}`
-            const { _id } = await this.leatherArticlesService.find({ [key]: leather })
+          filters.leathers.map(async value => {
+            const { _id } = await this.leatherArticlesService.find({ value })
 
             return { leather: _id }
           })

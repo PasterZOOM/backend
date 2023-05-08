@@ -6,4 +6,7 @@ export class LeatherArticleResponse {
 
   @ApiProperty({ type: String, description: 'название артикула' })
   title: string
+
+  @ApiProperty({ type: String, description: 'значение артикула для поиска' })
+  value: string
 }

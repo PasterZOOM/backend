@@ -17,6 +17,9 @@ export class LeatherArticle implements Omit<LeatherArticleEntity, '_id'> {
   @Prop({ type: SchemaTypes.ObjectId, default: '' })
   factory: Types.ObjectId
 
+  @Prop({ type: String, default: '' })
+  value: string
+
   @Prop({ default: {} })
   title: LocaleFieldEntity
 }

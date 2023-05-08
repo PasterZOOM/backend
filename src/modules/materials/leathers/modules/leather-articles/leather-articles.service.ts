@@ -23,8 +23,8 @@ export class LeatherArticlesService {
 
   async findAll(
     filter: FilterQuery<LeatherArticleDocument>
-  ): Promise<Pick<LeatherArticleEntity, '_id' | 'title'>[]> {
-    return this.LeatherArticleModel.find(filter, { _id: 1, title: 1 }).sort().exec()
+  ): Promise<Pick<LeatherArticleEntity, '_id' | 'title' | 'value'>[]> {
+    return this.LeatherArticleModel.find(filter, { _id: 1, title: 1, value: 1 }).sort().exec()
   }
 
   async findOne(id: Types.ObjectId): Promise<LeatherArticleEntity> {

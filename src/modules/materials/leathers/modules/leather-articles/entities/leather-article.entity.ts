@@ -23,4 +23,7 @@ export class LeatherArticleEntity {
 
   @ApiProperty({ type: LocaleFieldEntity, description: 'название артикула' })
   title: LocaleFieldEntity
+
+  @ApiProperty({ type: String, description: 'значение артикула для поиска' })
+  value: string
 }
