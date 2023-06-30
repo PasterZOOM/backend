@@ -7,6 +7,7 @@ export enum EFilterKeys {
   CATEGORIES = 'categories',
   LEATHERS = 'leathers',
   LEATHER_COLORS = 'leatherColors',
+  SEARCH = 'search',
 }
 
 export type PhotosType = Record<string, ProductPhotoType[]>

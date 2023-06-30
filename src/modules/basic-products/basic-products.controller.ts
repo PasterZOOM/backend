@@ -56,12 +56,14 @@ export class BasicProductsController {
   @ApiQuery({ name: EFilterKeys.CATEGORIES, required: false })
   @ApiQuery({ name: EFilterKeys.LEATHER_COLORS, required: false })
   @ApiQuery({ name: EFilterKeys.LEATHERS, required: false })
+  @ApiQuery({ name: EFilterKeys.SEARCH, required: false })
   async findAll(
     @Headers() { 'accept-language': locale },
-    @Query(EFilterKeys.ASSIGNMENTS) assignments?: string[],
-    @Query(EFilterKeys.CATEGORIES) categories?: string[],
-    @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[],
-    @Query(EFilterKeys.LEATHERS) leathers?: string[]
+    @Query(EFilterKeys.ASSIGNMENTS) assignments?: string[] | string,
+    @Query(EFilterKeys.CATEGORIES) categories?: string[] | string,
+    @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[] | string,
+    @Query(EFilterKeys.LEATHERS) leathers?: string[] | string,
+    @Query(EFilterKeys.SEARCH) search?: string
   ): Promise<
     Awaited<
       Omit<BasicProductEntity, 'leather'> & {
@@ -71,25 +73,18 @@ export class BasicProductsController {
     >[]
   > {
     const colors = leatherColors
-      ? (
-          await Promise.all(
-            leatherColors.map(async value => {
-              const colors = await this.leatherColorsService.findAll({ value })
-
-              return colors.map(color => color._id).join(',')
-            })
-          )
+      ? (await this.leatherColorsService.findAll({ value: { $in: leatherColors } })).map(color =>
+          color._id.toString()
         )
-          .map(color => color.split(','))
-          .flat()
       : undefined
 
     const filters = async (): Promise<FilterQuery<BasicProductDocument>> => {
-      const filters: Partial<Record<EFilterKeys, string[] | undefined>> = {
+      const filters: Partial<Record<EFilterKeys, string | string[] | undefined>> = {
         [EFilterKeys.ASSIGNMENTS]: assignments,
         [EFilterKeys.CATEGORIES]: categories,
         [EFilterKeys.LEATHER_COLORS]: colors,
         [EFilterKeys.LEATHERS]: leathers,
+        [EFilterKeys.SEARCH]: search,
       }
 
       let categoriesArray = []
@@ -98,22 +93,18 @@ export class BasicProductsController {
       let colorsArray = []
 
       if (filters.categories) {
-        categoriesArray = filters.categories.map(category => ({ category }))
+        categoriesArray = [filters.categories].flat().map(category => ({ category }))
       }
       if (filters.leathers) {
-        leathersArray = await Promise.all(
-          filters.leathers.map(async value => {
-            const { _id } = await this.leatherArticlesService.find({ value })
-
-            return { leather: _id }
-          })
-        )
+        leathersArray = (
+          await this.leatherArticlesService.findAll({ value: { $in: filters.leathers } })
+        ).map(color => ({ leather: color._id }))
       }
       if (filters.assignments) {
-        assignmentsArray = filters.assignments.map(assignments => ({ assignments }))
+        assignmentsArray = [filters.assignments].flat().map(assignments => ({ assignments }))
       }
       if (filters.leatherColors) {
-        colorsArray = filters.leatherColors.map(color => {
+        colorsArray = [filters.leatherColors].flat().map(color => {
           const key = `photos.${color}`
 
           return {
@@ -122,12 +113,22 @@ export class BasicProductsController {
         })
       }
 
+      const regex = new RegExp(search, 'i')
+
       return {
         $and: [
           categoriesArray.length ? { $or: categoriesArray } : {},
           leathersArray.length ? { $or: leathersArray } : {},
           assignmentsArray.length ? { $or: assignmentsArray } : {},
           colorsArray.length ? { $or: colorsArray } : {},
+          search
+            ? {
+                $or: [
+                  { [`title.${locale}`]: { $regex: regex } },
+                  { [`description.${locale}`]: { $regex: regex } },
+                ],
+              }
+            : {},
         ],
       }
     }
