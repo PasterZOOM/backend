@@ -10,17 +10,18 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
-import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
+import { ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { BasEntity } from 'src/common/entities/base.entity'
-import { TCountry } from 'src/common/interfaces/country.type'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
+import { CreateLeatherFactoryDto } from 'src/modules/materials/leathers/modules/leather-factories/dto/create-leather-factory.dto'
+import { LeatherFactoryResponse } from 'src/modules/materials/leathers/modules/leather-factories/dto/leather-factory-response.dto'
+import { UpdateLeatherFactoryDto } from 'src/modules/materials/leathers/modules/leather-factories/dto/update-leather-factory.dto'
+import { LeatherFactoryDocument } from 'src/modules/materials/leathers/modules/leather-factories/schemas/leather-factory.schema'
 
-import { LeatherArticleEntity } from '../leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 import { LeatherColorsService } from '../leather-colors/leather-colors.service'
 
-import { LeatherFactoryResponse } from './dto/leather-factory-response.dto'
-import { LeatherFactoryEntity } from './entities/leather-factory.entity'
 import { LeatherFactoriesService } from './leather-factories.service'
 
 @ApiTags('Leather-factories')
@@ -36,76 +37,45 @@ export class LeatherFactoriesController {
 
   @Post()
   async create(
-    @Body() { country, title, description }: LeatherFactoryResponse,
-    @Headers() { 'accept-language': locale }
-  ): Promise<BasEntity> {
-    const { _id } = await this.leatherFactoriesService.create({
+    @Body() { country, title, description }: CreateLeatherFactoryDto,
+    @Headers() { 'x-accept-language': locale }
+  ): Promise<LeatherFactoryResponse> {
+    const factory = await this.leatherFactoriesService.create({
       country,
       title: { en: '', ru: '', [locale]: title },
       description: { en: '', ru: '', [locale]: description },
     })
 
-    return { _id, title }
+    return this.generateResponseFactory({ locale, factory })
   }
 
   @Get()
-  @ApiOkResponse({
-    type: [PickType(LeatherFactoryEntity, ['_id', 'title'])],
-  })
-  async findAll(@Headers() { 'accept-language': locale }): Promise<BasEntity[]> {
+  async findAll(@Headers() { 'x-accept-language': locale }): Promise<BasEntity[]> {
     const factories = await this.leatherFactoriesService.findAll()
 
-    return factories.map(({ title, _id }) => ({ title: title[locale], _id }))
+    return Promise.all(factories.map(factory => this.generateResponseFactory({ locale, factory })))
   }
 
-  @Get(':id') // TODO написать возвращаемый тип для swagger
+  @Get(':id')
   async findOne(
     @Param('id') id: Types.ObjectId,
-    @Headers() { 'accept-language': locale }
-  ): Promise<
-    Omit<LeatherFactoryEntity, 'articles'> & {
-      articles: Pick<LeatherArticleEntity, '_id' | 'title'>[]
-    }
-  > {
-    const { articles, _id, description, country, title } =
-      await this.leatherFactoriesService.findOne(id)
+    @Headers() { 'x-accept-language': locale }
+  ): Promise<LeatherFactoryResponse> {
+    const factory = await this.leatherFactoriesService.findOne(id)
 
-    return {
-      _id,
-      description: description[locale],
-      country,
-      title: title[locale],
-      articles: await Promise.all(
-        articles.map(async articleId => {
-          const { _id, title } = await this.leatherArticlesService.findOne(articleId)
-
-          return { _id, title: title[locale] }
-        })
-      ),
-    }
+    return this.generateResponseFactory({ locale, factory })
   }
 
   @Patch(':id')
   async update(
     @Param('id') id: Types.ObjectId,
-    @Body() updateFactoryDto: Partial<LeatherFactoryResponse>,
-    @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
-  ): Promise<{
-    _id: Types.ObjectId
-    country: TCountry
-    title: string
-    description: string
-    articles: BasEntity[]
-  }> {
+    @Body() updateFactoryDto: Partial<UpdateLeatherFactoryDto>,
+    @Headers() { 'x-accept-language': locale }: { 'x-accept-language': keyof LocaleFieldEntity }
+  ): Promise<LeatherFactoryResponse> {
     const { description, title } = await this.leatherFactoriesService.findOne(id)
-    const {
-      articles,
-      _id,
-      title: { [locale]: newTitle },
-      description: { [locale]: newDescription },
-      country,
-    } = await this.leatherFactoriesService.update(id, {
-      country: updateFactoryDto.country,
+
+    const factory = await this.leatherFactoriesService.update(id, {
+      ...updateFactoryDto,
       title: updateFactoryDto.title && { ...title, [locale]: updateFactoryDto.title },
       description: updateFactoryDto.description && {
         ...description,
@@ -113,19 +83,7 @@ export class LeatherFactoriesController {
       },
     })
 
-    return {
-      _id,
-      country,
-      title: newTitle,
-      description: newDescription,
-      articles: await Promise.all(
-        articles.map(async articleId => {
-          const { _id, title } = await this.leatherArticlesService.findOne(articleId)
-
-          return { _id, title: title[locale] }
-        })
-      ),
-    }
+    return this.generateResponseFactory({ locale, factory })
   }
 
   @Delete(':id')
@@ -144,4 +102,22 @@ export class LeatherFactoriesController {
 
     await this.leatherFactoriesService.remove(id)
   }
+
+  async generateResponseFactory({
+    locale,
+    factory,
+  }: GenerateResponseArticleParams): Promise<LeatherFactoryResponse> {
+    const articles = (
+      await this.leatherArticlesService.findAll({ _id: { $in: factory.articles } })
+    ).map(({ _id, title }) => ({ _id, title: title[locale] }))
+
+    return {
+      ...factory.toJSON(),
+      articles,
+      title: factory.title[locale],
+      description: factory.description[locale],
+    }
+  }
 }
+
+type GenerateResponseArticleParams = { locale: string; factory: LeatherFactoryDocument }

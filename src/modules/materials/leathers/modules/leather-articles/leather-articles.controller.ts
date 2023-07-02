@@ -14,6 +14,7 @@ import {
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
 import { BasEntity } from 'src/common/entities/base.entity'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { LeatherArticleResponse } from 'src/modules/materials/leathers/modules/leather-articles/dto/leather-article-responce.dto'
 import { LeatherColorEntity } from 'src/modules/materials/leathers/modules/leather-colors/entities/leather-color.entity'
@@ -40,7 +41,7 @@ export class LeatherArticlesController {
   async create(
     @Body() { title, description, ...createLeatherArticle }: LeatherArticleResponse,
     @Param('factoryId') factoryId: Types.ObjectId,
-    @Headers() { 'accept-language': locale }
+    @Headers() { 'x-accept-language': locale }
   ): Promise<BasEntity> {
     try {
       const factory = await this.leatherFactoriesService.findOne(factoryId)
@@ -65,7 +66,7 @@ export class LeatherArticlesController {
     type: [PickType(LeatherArticleEntity, ['_id', 'title', 'value'])],
   })
   async findAll(
-    @Headers() { 'accept-language': locale },
+    @Headers() { 'x-accept-language': locale },
     @Query('filter') filter: FilterQuery<LeatherArticleEntity>
   ): Promise<BasEntity[]> {
     const articles = await this.leatherArticlesService.findAll(filter)
@@ -76,7 +77,7 @@ export class LeatherArticlesController {
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(
     @Param('id') id: Types.ObjectId,
-    @Headers() { 'accept-language': locale }
+    @Headers() { 'x-accept-language': locale }
   ): Promise<
     Omit<LeatherArticleEntity, 'colors' | 'factory'> & {
       colors: Pick<LeatherColorEntity, '_id' | 'title'>[]
@@ -107,7 +108,7 @@ export class LeatherArticlesController {
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() { value, ...updateLeatherArticleDto }: Partial<LeatherArticleResponse>,
-    @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
+    @Headers() { 'x-accept-language': locale }: { 'x-accept-language': keyof LocaleFieldEntity }
   ): Promise<{
     _id: Types.ObjectId
     title: string

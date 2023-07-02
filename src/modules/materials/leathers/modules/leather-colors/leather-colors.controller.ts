@@ -14,6 +14,7 @@ import {
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { BasEntity } from 'src/common/entities/base.entity'
+import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
 import { LeatherArticleEntity } from '../leather-articles/entities/leather-article.entity'
@@ -36,7 +37,7 @@ export class LeatherColorsController {
   async create(
     @Body() { title, description, ...createLeatherColor }: LeatherColorResponse,
     @Param('articleId') articleId: Types.ObjectId,
-    @Headers() { 'accept-language': locale }
+    @Headers() { 'x-accept-language': locale }
   ): Promise<{ _id: Types.ObjectId; title: string; photo: string }> {
     try {
       const { _id, photo } = await this.leatherColorsService.create({
@@ -57,7 +58,7 @@ export class LeatherColorsController {
   @Get()
   @ApiQuery({ name: '_id', required: false })
   async findAll(
-    @Headers() { 'accept-language': locale },
+    @Headers() { 'x-accept-language': locale },
     @Query('_id') _id?: Types.ObjectId[]
   ): Promise<Pick<LeatherColorEntity, '_id' | 'title' | 'photo'>[]> {
     const colors = await this.leatherColorsService.findAll(
@@ -70,7 +71,7 @@ export class LeatherColorsController {
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(
     @Param('id') id: Types.ObjectId,
-    @Headers() { 'accept-language': locale }
+    @Headers() { 'x-accept-language': locale }
   ): Promise<
     Omit<LeatherColorEntity, 'article'> & {
       article: Pick<LeatherArticleEntity, '_id' | 'title'>
@@ -96,7 +97,7 @@ export class LeatherColorsController {
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() { ...updateLeatherColorDto }: Partial<LeatherColorResponse>,
-    @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
+    @Headers() { 'x-accept-language': locale }: { 'x-accept-language': keyof LocaleFieldEntity }
   ): Promise<{
     _id: Types.ObjectId
     value: string

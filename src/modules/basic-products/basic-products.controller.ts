@@ -38,7 +38,7 @@ export class BasicProductsController {
   @Post()
   async create(
     @Body() { title, description, size, ...createBasicProductDto }: CreateBasicProductDto,
-    @Headers() { 'accept-language': locale }
+    @Headers() { 'x-accept-language': locale }
   ): Promise<BasicProductResponse> {
     const product = await this.basicProductsService.create({
       ...createBasicProductDto,
@@ -57,7 +57,7 @@ export class BasicProductsController {
   @ApiQuery({ name: EFilterKeys.LEATHERS, required: false })
   @ApiQuery({ name: EFilterKeys.SEARCH, required: false })
   async findAll(
-    @Headers() { 'accept-language': locale },
+    @Headers() { 'x-accept-language': locale },
     @Query(EFilterKeys.ASSIGNMENTS) assignments?: string[] | string,
     @Query(EFilterKeys.CATEGORIES) categories?: string[] | string,
     @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[] | string,
@@ -116,7 +116,7 @@ export class BasicProductsController {
 
   @Get(':id')
   async findOne(
-    @Headers() { 'accept-language': locale },
+    @Headers() { 'x-accept-language': locale },
     @Param('id') id: Types.ObjectId
   ): Promise<BasicProductResponse> {
     const product = await this.basicProductsService.findOne(id)
@@ -128,7 +128,7 @@ export class BasicProductsController {
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() updateBasicProductDto: UpdateBasicProductDto,
-    @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
+    @Headers() { 'x-accept-language': locale }
   ): Promise<BasicProductResponse> {
     const { size, title, description } = await this.basicProductsService.findOne(id)
 
@@ -152,7 +152,7 @@ export class BasicProductsController {
 
   @Put(':id/photo')
   async addPhoto(
-    @Headers() { 'accept-language': locale },
+    @Headers() { 'x-accept-language': locale },
     @Param('id') id: Types.ObjectId,
     @Body() photo: { [key: string]: string[] }
   ): Promise<BasicProductResponse> {
@@ -177,7 +177,7 @@ export class BasicProductsController {
 
   @Delete(':productId/photo/:photoId')
   async removePhoto(
-    @Headers() { 'accept-language': locale },
+    @Headers() { 'x-accept-language': locale },
     @Param('productId') productId: Types.ObjectId,
     @Param('photoId') photoId: Types.ObjectId
   ): Promise<BasicProductResponse> {
@@ -206,17 +206,20 @@ export class BasicProductsController {
   }: GenerateResponseProductParams): Promise<BasicProductResponse> {
     const productColors: BasicProductColor[] = (
       await this.leatherColorsService.findAll({ _id: { $in: Object.keys(product.photos) } })
-    ).map(({ _id, photo, title }) => ({ _id, photo, title: title[locale] }))
+    )
+      .map(({ _id, photo, title }) => ({ _id, photo, title: title[locale] }))
+      .sort((a, b) => (a.title > b.title ? 1 : -1))
 
     const leatherArticle = await this.leatherArticlesService.findOne(product.leather)
+    const leather = { _id: leatherArticle._id, title: leatherArticle.title[locale] }
 
     return {
       ...product.toJSON(),
+      leather,
+      productColors,
       size: product.size[locale],
       title: product.title[locale],
       description: product.description[locale],
-      leather: { _id: product.leather, title: leatherArticle.title[locale] },
-      productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
     }
   }
 }

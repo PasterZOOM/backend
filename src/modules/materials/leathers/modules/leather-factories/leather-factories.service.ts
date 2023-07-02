@@ -13,37 +13,37 @@ export class LeatherFactoriesService {
     @InjectModel(LeatherFactoryAlias) private LeatherFactoryModel: Model<LeatherFactoryDocument>
   ) {}
 
-  async create(createLeatherFactoryDto: CreateLeatherFactoryDto): Promise<LeatherFactoryEntity> {
+  async create(createLeatherFactoryDto: CreateLeatherFactoryDto): Promise<LeatherFactoryDocument> {
     const newLeatherFactory = new this.LeatherFactoryModel(createLeatherFactoryDto)
 
     return newLeatherFactory.save()
   }
 
-  async findAll(): Promise<LeatherFactoryEntity[]> {
+  async findAll(): Promise<LeatherFactoryDocument[]> {
     return this.LeatherFactoryModel.find().sort().exec()
   }
 
-  async findOne(id: Types.ObjectId): Promise<LeatherFactoryEntity> {
+  async findOne(id: Types.ObjectId): Promise<LeatherFactoryDocument> {
     return this.LeatherFactoryModel.findById(id)
   }
 
   async update(
     id: Types.ObjectId,
     updateLeatherFactoryDto: UpdateLeatherFactoryDto
-  ): Promise<LeatherFactoryEntity> {
+  ): Promise<LeatherFactoryDocument> {
     await this.LeatherFactoryModel.findByIdAndUpdate(id, updateLeatherFactoryDto)
 
     return this.findOne(id)
   }
 
-  async remove(id: Types.ObjectId): Promise<LeatherFactoryEntity> {
+  async remove(id: Types.ObjectId): Promise<LeatherFactoryDocument> {
     return this.LeatherFactoryModel.findByIdAndRemove(id)
   }
 
   async push(
     id: Types.ObjectId,
     addToSet: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: Types.ObjectId }
-  ): Promise<LeatherFactoryEntity> {
+  ): Promise<LeatherFactoryDocument> {
     return this.LeatherFactoryModel.findByIdAndUpdate(id, { $addToSet: addToSet })
   }
 

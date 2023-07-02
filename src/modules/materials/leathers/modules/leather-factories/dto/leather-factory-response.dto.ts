@@ -1,17 +1,25 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { ECountry, TCountry } from 'src/common/interfaces/country.type'
+import { ApiProperty, OmitType } from '@nestjs/swagger'
+import { BasEntity } from 'src/common/entities/base.entity'
 
-export class LeatherFactoryResponse {
+import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
+
+export class LeatherFactoryResponse extends OmitType(LeatherFactoryEntity, [
+  'articles',
+  'title',
+  'description',
+]) {
+  @ApiProperty({ type: BasEntity, description: 'Артикли кож которые выпускает фабрика' })
+  articles: BasEntity[]
+
   @ApiProperty({
-    enum: ECountry,
-    enumName: 'ECountry',
-    description: 'страна в которой находиться фабрика',
+    type: String,
+    description: 'Название фабрики на языке локали',
   })
-  country: TCountry
-
-  @ApiProperty({ type: String, description: 'описание фабрики' })
-  description: string
-
-  @ApiProperty({ type: String, description: 'название фабрики' })
   title: string
+
+  @ApiProperty({
+    type: String,
+    description: 'Описание фабрики на языке локали',
+  })
+  description: string
 }
