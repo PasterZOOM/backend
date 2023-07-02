@@ -11,18 +11,19 @@ import {
   Query,
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
-import { FilterQuery, Types } from 'mongoose'
-import { BasicProductResponse } from 'src/modules/basic-products/dto/basic-product-response.dto'
+import { Types } from 'mongoose'
 import { v1 } from 'uuid'
 
-import { LeatherArticleEntity } from '../materials/leathers/modules/leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from '../materials/leathers/modules/leather-articles/leather-articles.service'
 import { LeatherColorsService } from '../materials/leathers/modules/leather-colors/leather-colors.service'
 
 import { BasicProductsService } from './basic-products.service'
+import { BasicProductResponse } from './dto/basic-product-response.dto'
+import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
-import { BasicProductEntity } from './entities/basic-product.entity'
-import { EFilterKeys, ProductPhotoType } from './entities/basic-product.type'
+import { BasicProductColor } from './entities/basic-product-color.entity'
+import { EFilterKeys } from './entities/basic-product.type'
+import { PhotosEntity } from './entities/photo.entity'
 import { BasicProductDocument } from './schemas/basic-product.schema'
 
 @ApiTags('Basic-products')
@@ -36,22 +37,20 @@ export class BasicProductsController {
 
   @Post()
   async create(
-    @Body() { title, description, size, ...createBasicProductDto }: BasicProductResponse,
+    @Body() { title, description, size, ...createBasicProductDto }: CreateBasicProductDto,
     @Headers() { 'accept-language': locale }
-  ): Promise<{ _id: Types.ObjectId; title: string }> {
-    const { _id } = await this.basicProductsService.create({
+  ): Promise<BasicProductResponse> {
+    const product = await this.basicProductsService.create({
       ...createBasicProductDto,
       title: { en: '', ru: '', [locale]: title },
       description: { en: '', ru: '', [locale]: description },
       size: { en: '', ru: '', [locale]: size },
-      photos: {},
-      isPublished: false,
     })
 
-    return { _id, title }
+    return this.generateResponseProduct({ locale, product })
   }
 
-  @Get() // TODO написать возвращаемый тип для swagger
+  @Get()
   @ApiQuery({ name: EFilterKeys.ASSIGNMENTS, required: false })
   @ApiQuery({ name: EFilterKeys.CATEGORIES, required: false })
   @ApiQuery({ name: EFilterKeys.LEATHER_COLORS, required: false })
@@ -64,223 +63,76 @@ export class BasicProductsController {
     @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[] | string,
     @Query(EFilterKeys.LEATHERS) leathers?: string[] | string,
     @Query(EFilterKeys.SEARCH) search?: string
-  ): Promise<
-    Awaited<
-      Omit<BasicProductEntity, 'leather'> & {
-        leather: Pick<LeatherArticleEntity, '_id' | 'title'>
-        productColors: { _id: Types.ObjectId; photo: string; title: string }[]
-      }
-    >[]
-  > {
-    const colors = leatherColors
+  ): Promise<Awaited<BasicProductResponse>[]> {
+    const regex = new RegExp(search, 'i')
+
+    const basicProducts: BasicProductDocument[] = await this.basicProductsService.findAll({
+      $and: [
+        categories ? { $or: [categories].flat().map(category => ({ category })) } : {},
+        assignments ? { $or: [assignments].flat().map(assignments => ({ assignments })) } : {},
+        leathers
+          ? {
+              $or: (
+                await this.leatherArticlesService.findAll({ value: { $in: leathers } })
+              ).map(({ _id }) => ({ leather: _id })),
+            }
+          : {},
+        search
+          ? {
+              $or: [
+                { [`title.${locale}`]: { $regex: regex } },
+                { [`description.${locale}`]: { $regex: regex } },
+              ],
+            }
+          : {},
+      ],
+    })
+
+    const colorIds = leatherColors
       ? (await this.leatherColorsService.findAll({ value: { $in: leatherColors } })).map(color =>
           color._id.toString()
         )
       : undefined
 
-    const filters = async (): Promise<FilterQuery<BasicProductDocument>> => {
-      const filters: Partial<Record<EFilterKeys, string | string[] | undefined>> = {
-        [EFilterKeys.ASSIGNMENTS]: assignments,
-        [EFilterKeys.CATEGORIES]: categories,
-        [EFilterKeys.LEATHER_COLORS]: colors,
-        [EFilterKeys.LEATHERS]: leathers,
-        [EFilterKeys.SEARCH]: search,
-      }
-
-      let categoriesArray = []
-      let leathersArray = []
-      let assignmentsArray = []
-      let colorsArray = []
-
-      if (filters.categories) {
-        categoriesArray = [filters.categories].flat().map(category => ({ category }))
-      }
-      if (filters.leathers) {
-        leathersArray = (
-          await this.leatherArticlesService.findAll({ value: { $in: filters.leathers } })
-        ).map(color => ({ leather: color._id }))
-      }
-      if (filters.assignments) {
-        assignmentsArray = [filters.assignments].flat().map(assignments => ({ assignments }))
-      }
-      if (filters.leatherColors) {
-        colorsArray = [filters.leatherColors].flat().map(color => {
-          const key = `photos.${color}`
-
-          return {
-            [key]: { $exists: true },
-          }
-        })
-      }
-
-      const regex = new RegExp(search, 'i')
-
-      return {
-        $and: [
-          categoriesArray.length ? { $or: categoriesArray } : {},
-          leathersArray.length ? { $or: leathersArray } : {},
-          assignmentsArray.length ? { $or: assignmentsArray } : {},
-          colorsArray.length ? { $or: colorsArray } : {},
-          search
-            ? {
-                $or: [
-                  { [`title.${locale}`]: { $regex: regex } },
-                  { [`description.${locale}`]: { $regex: regex } },
-                ],
-              }
-            : {},
-        ],
-      }
-    }
-
-    const basicProducts = await this.basicProductsService.findAll(await filters())
-
     return (
       await Promise.all(
-        basicProducts.map(
-          async ({
-            category,
-            isPublished,
-            description,
-            costCurrency,
-            cost,
-            leather,
-            assignments,
-            punchPitch,
-            photos,
-            _id,
-            size,
-            title,
-          }) => {
-            const filteredPhotos: Record<string, ProductPhotoType[]> = {}
-            const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
+        basicProducts.map(async product => {
+          const filteredPhotos: PhotosEntity = {}
 
-            await Promise.all(
-              Object.entries(photos).map(async ([colorId, photos]) => {
-                const pushProductColor = async (): Promise<void> => {
-                  const { _id, photo, title } = await this.leatherColorsService.findOne(
-                    colorId as unknown as Types.ObjectId
-                  )
-
-                  productColors.push({ _id, photo, title: title[locale] })
-                }
-
-                if (colors && colors.includes(colorId)) {
-                  filteredPhotos[colorId] = photos
-                  await pushProductColor()
-                } else if (!colors) {
-                  await pushProductColor()
-                }
-              })
-            )
-
-            const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
-
-            return {
-              assignments,
-              isPublished,
-              _id,
-              punchPitch,
-              costCurrency,
-              category,
-              cost,
-              size: size[locale],
-              title: title[locale],
-              description: description[locale],
-              leather: { _id: leather, title: leatherTitle[locale] },
-              photos: colors ? filteredPhotos : photos,
-              productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
+          Object.keys(product.photos).forEach(colorId => {
+            if (colorIds && colorIds.includes(colorId)) {
+              filteredPhotos[colorId] = product.photos[colorId]
             }
+          })
+
+          return {
+            ...(await this.generateResponseProduct({ locale, product })),
+            photos: colorIds ? filteredPhotos : product.photos,
           }
-        )
+        })
       )
-    ).filter(el => (colors ? el.productColors.length !== 0 : true))
+    ).filter(el => (colorIds ? el.productColors.length !== 0 : true))
   }
 
-  @Get(':id') // TODO написать возвращаемый тип для swagger
+  @Get(':id')
   async findOne(
     @Headers() { 'accept-language': locale },
     @Param('id') id: Types.ObjectId
-  ): Promise<
-    Omit<BasicProductEntity, 'leather'> & {
-      leather: Pick<LeatherArticleEntity, '_id' | 'title'>
-      productColors: { _id: Types.ObjectId; photo: string; title: string }[]
-    }
-  > {
-    const {
-      assignments,
-      leather,
-      isPublished,
-      description,
-      category,
-      cost,
-      costCurrency,
-      photos,
-      punchPitch,
-      size,
-      _id,
-      title,
-    } = await this.basicProductsService.findOne(id)
+  ): Promise<BasicProductResponse> {
+    const product = await this.basicProductsService.findOne(id)
 
-    const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
-
-    await Promise.all(
-      Object.keys(photos).map(async colorId => {
-        const { _id, photo, title } = await this.leatherColorsService.findOne(
-          colorId as unknown as Types.ObjectId
-        )
-
-        productColors.push({ _id, photo, title: title[locale] })
-      })
-    )
-    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
-
-    return {
-      assignments,
-      isPublished,
-      _id,
-      punchPitch,
-      photos,
-      costCurrency,
-      category,
-      cost,
-      size: size[locale],
-      title: title[locale],
-      description: description[locale],
-      leather: { _id: leather, title: leatherTitle[locale] },
-      productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
-    }
+    return this.generateResponseProduct({ locale, product })
   }
 
-  @Patch(':id') // TODO написать возвращаемый тип для swagger
+  @Patch(':id')
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() updateBasicProductDto: UpdateBasicProductDto,
     @Headers() { 'accept-language': locale }: { 'accept-language': 'ru' | 'en' }
-  ): Promise<
-    Omit<BasicProductEntity, 'leather' | 'size' | 'title' | 'description'> & {
-      size: string
-      title: string
-      description: string
-      leather: { _id: Types.ObjectId; title: string }
-      productColors: { _id: Types.ObjectId; photo: string; title: string }[]
-    }
-  > {
+  ): Promise<BasicProductResponse> {
     const { size, title, description } = await this.basicProductsService.findOne(id)
-    const {
-      _id,
-      isPublished,
-      title: { [locale]: newTitle },
-      description: { [locale]: newDescription },
-      size: { [locale]: newSize },
-      photos,
-      punchPitch,
-      leather,
-      assignments,
-      costCurrency,
-      cost,
-      category,
-    } = await this.basicProductsService.update(id, {
+
+    const updatedProduct = await this.basicProductsService.update(id, {
       ...updateBasicProductDto,
       title: updateBasicProductDto.title && { ...title, [locale]: updateBasicProductDto.title },
       size: updateBasicProductDto.size && { ...size, [locale]: updateBasicProductDto.size },
@@ -289,34 +141,8 @@ export class BasicProductsController {
         [locale]: updateBasicProductDto.description,
       },
     })
-    const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
 
-    await Promise.all(
-      Object.keys(photos).map(async colorId => {
-        const { _id, photo, title } = await this.leatherColorsService.findOne(
-          colorId as unknown as Types.ObjectId
-        )
-
-        productColors.push({ _id, photo, title: title[locale] })
-      })
-    )
-    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
-
-    return {
-      assignments,
-      isPublished,
-      _id,
-      punchPitch,
-      photos,
-      costCurrency,
-      category,
-      cost,
-      size: newSize,
-      title: newTitle,
-      description: newDescription,
-      leather: { _id: leather, title: leatherTitle[locale] },
-      productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
-    }
+    return this.generateResponseProduct({ locale, product: updatedProduct })
   }
 
   @Delete(':id')
@@ -329,12 +155,7 @@ export class BasicProductsController {
     @Headers() { 'accept-language': locale },
     @Param('id') id: Types.ObjectId,
     @Body() photo: { [key: string]: string[] }
-  ): Promise<
-    Omit<BasicProductEntity, 'leather'> & {
-      leather: Pick<LeatherArticleEntity, '_id' | 'title'>
-      productColors: { _id: Types.ObjectId; photo: string; title: string }[]
-    }
-  > {
+  ): Promise<BasicProductResponse> {
     const product = await this.basicProductsService.findOne(id)
 
     Object.keys(photo).forEach(key => {
@@ -347,48 +168,11 @@ export class BasicProductsController {
       }
     })
 
-    const {
-      _id,
-      isPublished,
-      description,
-      title,
-      photos,
-      punchPitch,
-      size,
-      leather,
-      assignments,
-      costCurrency,
-      cost,
-      category,
-    } = await this.basicProductsService.update(id, { photos: product.photos })
-    const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
+    const updatedProduct = await this.basicProductsService.update(id, {
+      photos: product.photos,
+    })
 
-    await Promise.all(
-      Object.keys(photos).map(async colorId => {
-        const { _id, photo, title } = await this.leatherColorsService.findOne(
-          colorId as unknown as Types.ObjectId
-        )
-
-        productColors.push({ _id, photo, title: title[locale] })
-      })
-    )
-    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
-
-    return {
-      assignments,
-      isPublished,
-      _id,
-      punchPitch,
-      photos,
-      costCurrency,
-      category,
-      cost,
-      size: size[locale],
-      title: title[locale],
-      description: description[locale],
-      leather: { _id: leather, title: leatherTitle[locale] },
-      productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
-    }
+    return this.generateResponseProduct({ locale, product: updatedProduct })
   }
 
   @Delete(':productId/photo/:photoId')
@@ -396,12 +180,7 @@ export class BasicProductsController {
     @Headers() { 'accept-language': locale },
     @Param('productId') productId: Types.ObjectId,
     @Param('photoId') photoId: Types.ObjectId
-  ): Promise<
-    Omit<BasicProductEntity, 'leather'> & {
-      leather: Pick<LeatherArticleEntity, '_id' | 'title'>
-      productColors: { _id: Types.ObjectId; photo: string; title: string }[]
-    }
-  > {
+  ): Promise<BasicProductResponse> {
     const product = await this.basicProductsService.findOne(productId)
 
     Object.keys(product.photos).forEach(key => {
@@ -414,47 +193,32 @@ export class BasicProductsController {
       }
     })
 
-    const {
-      _id,
-      isPublished,
-      description,
-      title,
-      photos,
-      punchPitch,
-      size,
-      leather,
-      assignments,
-      costCurrency,
-      cost,
-      category,
-    } = await this.basicProductsService.update(productId, { photos: product.photos })
-    const productColors: { _id: Types.ObjectId; photo: string; title: string }[] = []
+    const updatedProduct = await this.basicProductsService.update(productId, {
+      photos: product.photos,
+    })
 
-    await Promise.all(
-      Object.keys(photos).map(async colorId => {
-        const { _id, photo, title } = await this.leatherColorsService.findOne(
-          colorId as unknown as Types.ObjectId
-        )
+    return this.generateResponseProduct({ locale, product: updatedProduct })
+  }
 
-        productColors.push({ _id, photo, title: title[locale] })
-      })
-    )
-    const { title: leatherTitle } = await this.leatherArticlesService.findOne(leather)
+  async generateResponseProduct({
+    locale,
+    product,
+  }: GenerateResponseProductParams): Promise<BasicProductResponse> {
+    const productColors: BasicProductColor[] = (
+      await this.leatherColorsService.findAll({ _id: { $in: Object.keys(product.photos) } })
+    ).map(({ _id, photo, title }) => ({ _id, photo, title: title[locale] }))
+
+    const leatherArticle = await this.leatherArticlesService.findOne(product.leather)
 
     return {
-      assignments,
-      isPublished,
-      _id,
-      punchPitch,
-      photos,
-      costCurrency,
-      category,
-      cost,
-      size: size[locale],
-      title: title[locale],
-      description: description[locale],
-      leather: { _id: leather, title: leatherTitle[locale] },
+      ...product.toJSON(),
+      size: product.size[locale],
+      title: product.title[locale],
+      description: product.description[locale],
+      leather: { _id: product.leather, title: leatherArticle.title[locale] },
       productColors: productColors.sort((a, b) => (a.title > b.title ? 1 : -1)),
     }
   }
 }
+
+type GenerateResponseProductParams = { locale: string; product: BasicProductDocument }

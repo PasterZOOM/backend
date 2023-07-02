@@ -13,12 +13,13 @@ import {
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
+import { BasEntity } from 'src/common/entities/base.entity'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
-import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
-import { LeatherColorResponse } from 'src/modules/materials/leathers/modules/leather-colors/dto/leather-color-response.dto'
 
+import { LeatherArticleEntity } from '../leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 
+import { LeatherColorResponse } from './dto/leather-color-response.dto'
 import { LeatherColorEntity } from './entities/leather-color.entity'
 import { LeatherColorsService } from './leather-colors.service'
 
@@ -103,7 +104,7 @@ export class LeatherColorsController {
     photo: string
     title: string
     description: string
-    article: { _id: Types.ObjectId; title: string }
+    article: BasEntity
   }> {
     const { description, title } = await this.leatherColorsService.findOne(id)
 

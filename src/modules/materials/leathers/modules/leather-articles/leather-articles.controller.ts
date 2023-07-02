@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
+import { BasEntity } from 'src/common/entities/base.entity'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { LeatherArticleResponse } from 'src/modules/materials/leathers/modules/leather-articles/dto/leather-article-responce.dto'
 import { LeatherColorEntity } from 'src/modules/materials/leathers/modules/leather-colors/entities/leather-color.entity'
@@ -40,7 +41,7 @@ export class LeatherArticlesController {
     @Body() { title, description, ...createLeatherArticle }: LeatherArticleResponse,
     @Param('factoryId') factoryId: Types.ObjectId,
     @Headers() { 'accept-language': locale }
-  ): Promise<{ _id: Types.ObjectId; title: string }> {
+  ): Promise<BasEntity> {
     try {
       const factory = await this.leatherFactoriesService.findOne(factoryId)
 
@@ -66,7 +67,7 @@ export class LeatherArticlesController {
   async findAll(
     @Headers() { 'accept-language': locale },
     @Query('filter') filter: FilterQuery<LeatherArticleEntity>
-  ): Promise<{ _id: Types.ObjectId; title: string }[]> {
+  ): Promise<BasEntity[]> {
     const articles = await this.leatherArticlesService.findAll(filter)
 
     return articles.map(({ title, _id, value }) => ({ title: title[locale], _id, value }))
@@ -112,8 +113,8 @@ export class LeatherArticlesController {
     title: string
     description: string
     value: string
-    factory: { _id: Types.ObjectId; title: string }
-    colors: { _id: Types.ObjectId; title: string }[]
+    factory: BasEntity
+    colors: BasEntity[]
   }> {
     const { description, title } = await this.leatherArticlesService.findOne(id)
     const {

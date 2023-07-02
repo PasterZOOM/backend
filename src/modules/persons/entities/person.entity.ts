@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { SchemaTypes, Types } from 'mongoose'
+import { Types } from 'mongoose'
 
 import {
   ECommunicationMethod,
@@ -13,11 +13,11 @@ import {
 } from './persons.type'
 
 export class PersonEntity {
-  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер персоны' })
+  @ApiProperty({ type: String, description: 'идентификационный номер персоны' })
   _id: Types.ObjectId
 
   @ApiProperty({
-    type: [SchemaTypes.ObjectId],
+    type: [String],
     description: 'массив содержащий id адресов принадлежащих персоне, индекс 0 - ОСНОВНОЙ адрес',
   })
   addressIds: Types.ObjectId[]
@@ -51,7 +51,7 @@ export class PersonEntity {
   lastName: string
 
   @ApiProperty({
-    type: [SchemaTypes.ObjectId],
+    type: [String],
     description: 'массив содержащий id заказов принадлежащих персоне',
   })
   orderIds: Types.ObjectId[]

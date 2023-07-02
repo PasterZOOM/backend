@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { SchemaTypes, Types } from 'mongoose'
+import { Types } from 'mongoose'
 
 export class ThreadEntity {
-  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер нити' })
+  @ApiProperty({ type: String, description: 'идентификационный номер нити' })
   _id: Types.ObjectId
 
   @ApiProperty({ type: String, description: 'цвет нити' })

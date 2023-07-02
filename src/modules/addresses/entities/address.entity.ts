@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { SchemaTypes, Types } from 'mongoose'
+import { Types } from 'mongoose'
 
 import { EDeliveryMethod, EDeliveryPlace, TDeliveryMethod, TDeliveryPlace } from './addresses.type'
 
 export class AddressEntity {
-  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер адреса' })
+  @ApiProperty({ type: String, description: 'идентификационный номер адреса' })
   _id: Types.ObjectId
 
   @ApiProperty({ type: String, description: 'номер квартиры' })
@@ -33,7 +33,7 @@ export class AddressEntity {
   index?: string = ''
 
   @ApiProperty({
-    type: SchemaTypes.ObjectId,
+    type: String,
     description: 'идентификационный номер владельца адреса',
   })
   ownerId: Types.ObjectId

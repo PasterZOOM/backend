@@ -2,11 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, SchemaTypes, Types } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECost } from 'src/common/interfaces/cost.type'
+import { PhotosEntity } from 'src/modules/basic-products/entities/photo.entity'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
 
 import { EPunchPitch } from '../../materials/common/materials.type'
 import { BasicProductEntity } from '../entities/basic-product.entity'
-import { PhotosType } from '../entities/basic-product.type'
 
 export type BasicProductDocument = BasicProduct & Document
 
@@ -39,8 +39,8 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ default: EProductCategory.WATCH_STRAP })
   category: EProductCategory
 
-  @Prop({ type: Object, default: {} })
-  photos: PhotosType
+  @Prop({ type: PhotosEntity, default: {} })
+  photos: PhotosEntity
 
   @Prop({ default: false })
   isPublished: boolean

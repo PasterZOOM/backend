@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { SchemaTypes, Types } from 'mongoose'
+import { Types } from 'mongoose'
 import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { EPaymentFor, TPaymentFor } from './orders.type'
@@ -10,7 +10,7 @@ export class DeliveryOrderDataEntity {
   cost: CostEntity
 
   @ApiProperty({
-    type: SchemaTypes.ObjectId,
+    type: String,
     description: 'идентификационный номер адреса доставки',
   })
   delivery: Types.ObjectId

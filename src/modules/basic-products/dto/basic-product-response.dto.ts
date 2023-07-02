@@ -1,52 +1,36 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { SchemaTypes, Types } from 'mongoose'
-import { ECost } from 'src/common/interfaces/cost.type'
-import { EPunchPitch } from 'src/modules/materials/common/materials.type'
-import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
+import { ApiProperty, OmitType } from '@nestjs/swagger'
+import { BasEntity } from 'src/common/entities/base.entity'
 
-export class BasicProductResponse {
+import { BasicProductColor } from '../entities/basic-product-color.entity'
+import { BasicProductEntity } from '../entities/basic-product.entity'
+
+export class BasicProductResponse extends OmitType(BasicProductEntity, [
+  'leather',
+  'size',
+  'title',
+  'description',
+]) {
   @ApiProperty({
-    type: () => [String],
-    description: 'массив назначений базового продукта',
+    type: String,
+    description: 'Размер изделия на языке локали',
   })
-  assignments: EProductAssignment[]
-
-  @ApiProperty({
-    enum: EProductCategory,
-    enumName: 'EProductCategory',
-    description: 'категория к которой относится базовое изделие',
-  })
-  category: EProductCategory
-
-  @ApiProperty({ type: Number, description: 'цена изделия' })
-  cost: number
-
-  @ApiProperty({
-    enum: ECost,
-    enumName: 'ECost',
-    description: 'валюта в которой представлена цена на изделие',
-  })
-  costCurrency: ECost
-
-  @ApiProperty({ type: String, description: 'описание базового изделия' })
-  description: string
-
-  @ApiProperty({
-    type: SchemaTypes.ObjectId,
-    description: 'идентификационный номер артикула кожи из которой сделано базовое изделие',
-  })
-  leather: Types.ObjectId
-
-  @ApiProperty({
-    enum: EPunchPitch,
-    enumName: 'EPunchPitch',
-    description: 'шаг пробойника который использовался при изготовлении',
-  })
-  punchPitch: EPunchPitch
-
-  @ApiProperty({ type: String, description: 'размер изделия' })
   size: string
 
-  @ApiProperty({ type: String, description: 'название изделия' })
+  @ApiProperty({
+    type: String,
+    description: 'Название изделия на языке локали',
+  })
   title: string
+
+  @ApiProperty({
+    type: String,
+    description: 'Описание изделия на языке локали',
+  })
+  description: string
+
+  @ApiProperty({ type: BasEntity, description: 'Из какой кожи изготовлено изделие' })
+  leather: BasEntity
+
+  @ApiProperty({ type: [BasicProductColor], description: 'В каких цветах существует изделие' })
+  productColors: BasicProductColor[]
 }

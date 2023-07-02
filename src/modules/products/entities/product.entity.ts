@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { SchemaTypes, Types } from 'mongoose'
+import { Types } from 'mongoose'
 import { CostEntity } from 'src/common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
@@ -7,7 +7,7 @@ import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 import { EProductCategory, TProductAssignment, TProductCategory } from './product.type'
 
 export class ProductEntity {
-  @ApiProperty({ type: SchemaTypes.ObjectId, description: 'идентификационный номер изделия' })
+  @ApiProperty({ type: String, description: 'идентификационный номер изделия' })
   _id: Types.ObjectId
 
   @ApiProperty({
@@ -35,13 +35,13 @@ export class ProductEntity {
   description?: string = ''
 
   @ApiProperty({
-    type: SchemaTypes.ObjectId,
+    type: String,
     description: 'идентификационный номер кожи из которой изготовлено изделие',
   })
   leather: Types.ObjectId
 
   @ApiProperty({
-    type: SchemaTypes.ObjectId,
+    type: String,
     description:
       "идентификационный номер заказа для которого было изготовлено изделие, '' - изделие в наличии",
   })
@@ -61,7 +61,7 @@ export class ProductEntity {
   size: string
 
   @ApiProperty({
-    type: SchemaTypes.ObjectId,
+    type: String,
     description: 'идентификационный номер нити которой прошито изделие',
   })
   thread: Types.ObjectId

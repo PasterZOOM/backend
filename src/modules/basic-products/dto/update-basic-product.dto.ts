@@ -1,5 +1,6 @@
-import { IntersectionType, PartialType } from '@nestjs/swagger'
+import { IntersectionType, OmitType, PartialType } from '@nestjs/swagger'
+import { BasicProductEntity } from 'src/modules/basic-products/entities/basic-product.entity'
 
-import { CreateBasicProductDto } from './create-basic-product.dto'
-
-export class UpdateBasicProductDto extends PartialType(IntersectionType(CreateBasicProductDto)) {}
+export class UpdateBasicProductDto extends PartialType(
+  IntersectionType(OmitType(BasicProductEntity, ['_id']))
+) {}
