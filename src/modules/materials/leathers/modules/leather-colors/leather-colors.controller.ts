@@ -39,20 +39,16 @@ export class LeatherColorsController {
     @Param('articleId') articleId: Types.ObjectId,
     @Headers() { 'x-accept-language': locale }
   ): Promise<{ _id: Types.ObjectId; title: string; photo: string }> {
-    try {
-      const { _id, photo } = await this.leatherColorsService.create({
-        title: { en: '', ru: '', [locale]: title },
-        description: { en: '', ru: '', [locale]: description },
-        article: articleId,
-        ...createLeatherColor,
-      })
+    const { _id, photo } = await this.leatherColorsService.create({
+      title: { en: '', ru: '', [locale]: title },
+      description: { en: '', ru: '', [locale]: description },
+      article: articleId,
+      ...createLeatherColor,
+    })
 
-      await this.leatherArticlesService.push(articleId, { colors: _id })
+    await this.leatherArticlesService.push(articleId, { colors: _id })
 
-      return { title, _id, photo }
-    } catch (e) {
-      throw new BadIdException('factory', e)
-    }
+    return { title, _id, photo }
   }
 
   @Get()

@@ -12,17 +12,16 @@ import {
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { BasEntity } from 'src/common/entities/base.entity'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { CreateLeatherFactoryDto } from 'src/modules/materials/leathers/modules/leather-factories/dto/create-leather-factory.dto'
-import { LeatherFactoryResponse } from 'src/modules/materials/leathers/modules/leather-factories/dto/leather-factory-response.dto'
-import { UpdateLeatherFactoryDto } from 'src/modules/materials/leathers/modules/leather-factories/dto/update-leather-factory.dto'
-import { LeatherFactoryDocument } from 'src/modules/materials/leathers/modules/leather-factories/schemas/leather-factory.schema'
 
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 import { LeatherColorsService } from '../leather-colors/leather-colors.service'
 
+import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
+import { LeatherFactoryResponse } from './dto/leather-factory-response.dto'
+import { UpdateLeatherFactoryDto } from './dto/update-leather-factory.dto'
 import { LeatherFactoriesService } from './leather-factories.service'
+import { LeatherFactoryDocument } from './schemas/leather-factory.schema'
 
 @ApiTags('Leather-factories')
 @Controller('leather-factories')
@@ -50,7 +49,7 @@ export class LeatherFactoriesController {
   }
 
   @Get()
-  async findAll(@Headers() { 'x-accept-language': locale }): Promise<BasEntity[]> {
+  async findAll(@Headers() { 'x-accept-language': locale }): Promise<LeatherFactoryResponse[]> {
     const factories = await this.leatherFactoriesService.findAll()
 
     return Promise.all(factories.map(factory => this.generateResponseFactory({ locale, factory })))
@@ -106,7 +105,7 @@ export class LeatherFactoriesController {
   async generateResponseFactory({
     locale,
     factory,
-  }: GenerateResponseArticleParams): Promise<LeatherFactoryResponse> {
+  }: GenerateResponseFactoryParams): Promise<LeatherFactoryResponse> {
     const articles = (
       await this.leatherArticlesService.findAll({ _id: { $in: factory.articles } })
     ).map(({ _id, title }) => ({ _id, title: title[locale] }))
@@ -120,4 +119,4 @@ export class LeatherFactoriesController {
   }
 }
 
-type GenerateResponseArticleParams = { locale: string; factory: LeatherFactoryDocument }
+type GenerateResponseFactoryParams = { locale: string; factory: LeatherFactoryDocument }

@@ -8,7 +8,7 @@ export class LeatherFactoryResponse extends OmitType(LeatherFactoryEntity, [
   'title',
   'description',
 ]) {
-  @ApiProperty({ type: BasEntity, description: 'Артикли кож которые выпускает фабрика' })
+  @ApiProperty({ type: [BasEntity], description: 'Артикулы кож которые выпускает фабрика' })
   articles: BasEntity[]
 
   @ApiProperty({
