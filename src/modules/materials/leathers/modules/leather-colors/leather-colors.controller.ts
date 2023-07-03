@@ -116,9 +116,9 @@ export class LeatherColorsController {
     const article = await this.leatherArticlesService.findOne(color.article)
 
     return {
-      ...article.toJSON(),
-      title: article.title[locale],
-      description: article.description[locale],
+      ...color.toJSON(),
+      title: color.title[locale],
+      description: color.description[locale],
       article: { _id: article.id, title: article.title[locale] },
     }
   }
