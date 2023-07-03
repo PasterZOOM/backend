@@ -36,11 +36,11 @@ export class LeatherFactoriesController {
 
   @Post()
   async create(
-    @Body() { country, title, description }: CreateLeatherFactoryDto,
+    @Body() { title, description, ...createLeatherFactory }: CreateLeatherFactoryDto,
     @Headers() { 'x-accept-language': locale }
   ): Promise<LeatherFactoryResponse> {
     const factory = await this.leatherFactoriesService.create({
-      country,
+      ...createLeatherFactory,
       title: { en: '', ru: '', [locale]: title },
       description: { en: '', ru: '', [locale]: description },
     })

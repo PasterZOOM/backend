@@ -1,29 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { ELeatherColor } from 'src/modules/materials/leathers/modules/leather-colors/entities/leather-colors.type'
+import { ApiProperty, OmitType } from '@nestjs/swagger'
+import { BasEntity } from 'src/common/entities/base.entity'
 
-export class LeatherColorResponse {
-  @ApiProperty({
-    type: String,
-    description: 'код цвета кожи',
-  })
-  code: string
+import { LeatherColorEntity } from '../entities/leather-color.entity'
 
-  @ApiProperty({ type: String, description: 'фото цвета кожи' })
-  photo: string
-
+export class LeatherColorResponse extends OmitType(LeatherColorEntity, [
+  'description',
+  'title',
+  'article',
+]) {
   @ApiProperty({
     type: String,
     description: 'название цвета',
   })
   title: string
 
-  @ApiProperty({
-    enum: ELeatherColor,
-    enumName: 'ELeatherColor',
-    description: 'к какой категории цветов относится цвет',
-  })
-  value: string
-
   @ApiProperty({ type: String, description: 'описание цвета' })
   description: string
+
+  @ApiProperty({ type: BasEntity, description: 'артикул к которому относится цвет' })
+  article: BasEntity
 }

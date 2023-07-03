@@ -13,16 +13,15 @@ import {
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { BasEntity } from 'src/common/entities/base.entity'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
-import { LeatherArticleEntity } from '../leather-articles/entities/leather-article.entity'
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 
+import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { LeatherColorResponse } from './dto/leather-color-response.dto'
-import { LeatherColorEntity } from './entities/leather-color.entity'
 import { LeatherColorsService } from './leather-colors.service'
+import { LeatherColorDocument } from './schemas/leather-color.schema'
 
 @ApiTags('Leather-colors')
 @Controller('leather-colors')
@@ -35,20 +34,20 @@ export class LeatherColorsController {
 
   @Post(':articleId')
   async create(
-    @Body() { title, description, ...createLeatherColor }: LeatherColorResponse,
+    @Body() { title, description, ...createLeatherColor }: CreateLeatherColorDto,
     @Param('articleId') articleId: Types.ObjectId,
     @Headers() { 'x-accept-language': locale }
-  ): Promise<{ _id: Types.ObjectId; title: string; photo: string }> {
-    const { _id, photo } = await this.leatherColorsService.create({
+  ): Promise<LeatherColorResponse> {
+    const color = await this.leatherColorsService.create({
+      ...createLeatherColor,
       title: { en: '', ru: '', [locale]: title },
       description: { en: '', ru: '', [locale]: description },
       article: articleId,
-      ...createLeatherColor,
     })
 
-    await this.leatherArticlesService.push(articleId, { colors: _id })
+    await this.leatherArticlesService.push(articleId, { colors: color._id })
 
-    return { title, _id, photo }
+    return this.generateResponseArticle({ locale, color })
   }
 
   @Get()
@@ -56,37 +55,22 @@ export class LeatherColorsController {
   async findAll(
     @Headers() { 'x-accept-language': locale },
     @Query('_id') _id?: Types.ObjectId[]
-  ): Promise<Pick<LeatherColorEntity, '_id' | 'title' | 'photo'>[]> {
+  ): Promise<LeatherColorResponse[]> {
     const colors = await this.leatherColorsService.findAll(
       _id ? { $or: _id.map(_id => ({ _id })) } : undefined
     )
 
-    return colors.map(({ title, _id, photo }) => ({ title: title[locale], _id, photo }))
+    return Promise.all(colors.map(color => this.generateResponseArticle({ locale, color })))
   }
 
   @Get(':id') // TODO написать возвращаемый тип для swagger
   async findOne(
     @Param('id') id: Types.ObjectId,
     @Headers() { 'x-accept-language': locale }
-  ): Promise<
-    Omit<LeatherColorEntity, 'article'> & {
-      article: Pick<LeatherArticleEntity, '_id' | 'title'>
-    }
-  > {
-    const { article, _id, photo, description, title, value, code } =
-      await this.leatherColorsService.findOne(id)
+  ): Promise<LeatherColorResponse> {
+    const color = await this.leatherColorsService.findOne(id)
 
-    const { title: articleTitle } = await this.leatherArticlesService.findOne(article)
-
-    return {
-      _id,
-      photo,
-      code,
-      value,
-      title: title[locale],
-      description: description[locale],
-      article: { _id: article, title: articleTitle[locale] },
-    }
+    return this.generateResponseArticle({ locale, color })
   }
 
   @Patch(':id')
@@ -94,26 +78,10 @@ export class LeatherColorsController {
     @Param('id') id: Types.ObjectId,
     @Body() { ...updateLeatherColorDto }: Partial<LeatherColorResponse>,
     @Headers() { 'x-accept-language': locale }: { 'x-accept-language': keyof LocaleFieldEntity }
-  ): Promise<{
-    _id: Types.ObjectId
-    value: string
-    code: string
-    photo: string
-    title: string
-    description: string
-    article: BasEntity
-  }> {
+  ): Promise<LeatherColorResponse> {
     const { description, title } = await this.leatherColorsService.findOne(id)
 
-    const {
-      article,
-      _id,
-      title: { [locale]: newTitle },
-      description: { [locale]: newDescription },
-      value,
-      code,
-      photo,
-    } = await this.leatherColorsService.update(id, {
+    const color = await this.leatherColorsService.update(id, {
       ...updateLeatherColorDto,
       title: updateLeatherColorDto.title && { ...title, [locale]: updateLeatherColorDto.title },
       description: updateLeatherColorDto.description && {
@@ -122,17 +90,7 @@ export class LeatherColorsController {
       },
     })
 
-    const { title: articleTitle } = await this.leatherArticlesService.findOne(article)
-
-    return {
-      _id,
-      value,
-      code,
-      photo,
-      title: newTitle,
-      description: newDescription,
-      article: { _id: article, title: articleTitle[locale] },
-    }
+    return this.generateResponseArticle({ locale, color })
   }
 
   @Delete(':id')
@@ -150,4 +108,23 @@ export class LeatherColorsController {
       throw new BadIdException('address', e)
     }
   }
+
+  async generateResponseArticle({
+    locale,
+    color,
+  }: GenerateResponseColorParams): Promise<LeatherColorResponse> {
+    const article = await this.leatherArticlesService.findOne(color.article)
+
+    return {
+      ...article.toJSON(),
+      title: article.title[locale],
+      description: article.description[locale],
+      article: { _id: article.id, title: article.title[locale] },
+    }
+  }
+}
+
+type GenerateResponseColorParams = {
+  locale: string
+  color: LeatherColorDocument
 }
