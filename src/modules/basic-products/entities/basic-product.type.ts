@@ -8,4 +8,6 @@ export enum EFilterKeys {
   LEATHERS = 'leathers',
   LEATHER_COLORS = 'leatherColors',
   SEARCH = 'search',
+  PAGE = 'page',
+  PAGE_SIZE = 'pageSize',
 }

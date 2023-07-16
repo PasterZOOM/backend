@@ -62,19 +62,20 @@ export class BasicProductsController {
     @Query(EFilterKeys.CATEGORIES) categories?: string[] | string,
     @Query(EFilterKeys.LEATHER_COLORS) leatherColors?: string[] | string,
     @Query(EFilterKeys.LEATHERS) leathers?: string[] | string,
-    @Query(EFilterKeys.SEARCH) search?: string
-  ): Promise<Awaited<BasicProductResponse>[]> {
+    @Query(EFilterKeys.SEARCH) search?: string,
+    @Query(EFilterKeys.PAGE) page = '1',
+    @Query(EFilterKeys.PAGE_SIZE) pageSize = '9'
+  ): Promise<{ totalCount: number; data: Awaited<BasicProductResponse>[] }> {
     const regex = new RegExp(search, 'i')
-
-    const basicProducts: BasicProductDocument[] = await this.basicProductsService.findAll({
+    const filters = {
       $and: [
         categories ? { $or: [categories].flat().map(category => ({ category })) } : {},
         assignments ? { $or: [assignments].flat().map(assignments => ({ assignments })) } : {},
         leathers
           ? {
-              $or: (
-                await this.leatherArticlesService.findAll({ value: { $in: leathers } })
-              ).map(({ _id }) => ({ leather: _id })),
+              $or: (await this.leatherArticlesService.findAll({ value: { $in: leathers } })).map(
+                ({ _id }) => ({ leather: _id })
+              ),
             }
           : {},
         search
@@ -86,7 +87,16 @@ export class BasicProductsController {
             }
           : {},
       ],
-    })
+    }
+    const totalCount: number = await this.basicProductsService.countDocuments(filters)
+
+    const skip = +page * +pageSize - +pageSize
+
+    const basicProducts: BasicProductDocument[] = await this.basicProductsService.findAll(
+      filters,
+      +pageSize,
+      skip
+    )
 
     const colorIds = leatherColors
       ? (await this.leatherColorsService.findAll({ value: { $in: leatherColors } })).map(color =>
@@ -94,24 +104,27 @@ export class BasicProductsController {
         )
       : undefined
 
-    return (
-      await Promise.all(
-        basicProducts.map(async product => {
-          const filteredPhotos: PhotosEntity = {}
+    return {
+      totalCount,
+      data: (
+        await Promise.all(
+          basicProducts.map(async product => {
+            const filteredPhotos: PhotosEntity = {}
 
-          Object.keys(product.photos).forEach(colorId => {
-            if (colorIds && colorIds.includes(colorId)) {
-              filteredPhotos[colorId] = product.photos[colorId]
+            Object.keys(product.photos).forEach(colorId => {
+              if (colorIds && colorIds.includes(colorId)) {
+                filteredPhotos[colorId] = product.photos[colorId]
+              }
+            })
+
+            return {
+              ...(await this.generateResponseProduct({ locale, product })),
+              photos: colorIds ? filteredPhotos : product.photos,
             }
           })
-
-          return {
-            ...(await this.generateResponseProduct({ locale, product })),
-            photos: colorIds ? filteredPhotos : product.photos,
-          }
-        })
-      )
-    ).filter(el => (colorIds ? el.productColors.length !== 0 : true))
+        )
+      ).filter(el => (colorIds ? el.productColors.length !== 0 : true)),
+    }
   }
 
   @Get(':id')
