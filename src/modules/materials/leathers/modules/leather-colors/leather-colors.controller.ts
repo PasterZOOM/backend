@@ -125,6 +125,6 @@ export class LeatherColorsController {
 }
 
 type GenerateResponseColorParams = {
-  locale: string
   color: LeatherColorDocument
+  locale: string
 }

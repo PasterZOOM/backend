@@ -1,11 +1,11 @@
 export enum EProductAssignment {
-  FOR_CLOTH = 'for_cloth',
+  FOR_AIRPODS = 'for_airpods',
   FOR_CARDS = 'for_cards',
   FOR_CASH = 'for_cash',
+  FOR_CLOTH = 'for_cloth',
   FOR_COINS = 'for_coins',
   FOR_DOCUMENTS = 'for_documents',
   FOR_WATCH = 'for_watch',
-  FOR_AIRPODS = 'for_airpods',
 }
 export enum EProductCategory {
   AUTODOC_HOLDER = 'autodoc_holder',

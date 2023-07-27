@@ -10,6 +10,10 @@ module.exports = {
     '@typescript-eslint',
     'prettier',
     'sonarjs',
+    'sort-destructure-keys',
+    'sort-keys-fix',
+    '@typescript-eslint',
+    'typescript-sort-keys',
   ],
   extends: [
     'airbnb',
@@ -46,6 +50,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/prefer-default-export': 'off',
     'consistent-return': 'off',
+    'no-empty-function': ['error', { allow: ['constructors'] }],
     'padding-line-between-statements': [
       'error',
       {
@@ -89,7 +94,6 @@ module.exports = {
         ignorePropertyModificationsFor: ['state', 'self'],
       },
     ],
-    '@typescript-eslint/no-unused-vars': ['error'],
     'class-methods-use-this': 'off',
     '@typescript-eslint/explicit-function-return-type': [
       'error',
@@ -103,6 +107,15 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     'no-useless-constructor': 'off',
     'import/no-extraneous-dependencies': 'off',
+    '@typescript-eslint/sort-type-constituents': 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+      },
+    ],
+    'typescript-sort-keys/interface': 'error',
+    'typescript-sort-keys/string-enum': 'error',
   },
   settings: {
     'import/resolver': {

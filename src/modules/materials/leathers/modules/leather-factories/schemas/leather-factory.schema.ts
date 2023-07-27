@@ -5,7 +5,7 @@ import { TCountry } from 'src/common/interfaces/country.type'
 
 import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
 
-export type LeatherFactoryDocument = LeatherFactory & Document
+export type LeatherFactoryDocument = Document & LeatherFactory
 
 @Schema()
 export class LeatherFactory implements Omit<LeatherFactoryEntity, '_id'> {

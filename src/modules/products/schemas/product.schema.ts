@@ -6,7 +6,7 @@ import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 import { ProductEntity } from '../entities/product.entity'
 import { EProductCategory, TProductAssignment, TProductCategory } from '../entities/product.type'
 
-export type ProductDocument = Product & Document
+export type ProductDocument = Document & Product
 
 @Schema()
 export class Product implements Omit<ProductEntity, '_id'> {

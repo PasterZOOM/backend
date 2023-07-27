@@ -128,6 +128,6 @@ export class LeatherArticlesController {
 }
 
 type GenerateResponseArticleParams = {
-  locale: string
   article: LeatherArticleDocument
+  locale: string
 }

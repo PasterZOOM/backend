@@ -65,7 +65,7 @@ export class BasicProductsController {
     @Query(EFilterKeys.SEARCH) search?: string,
     @Query(EFilterKeys.PAGE) page = '1',
     @Query(EFilterKeys.PAGE_SIZE) pageSize = '9'
-  ): Promise<{ totalCount: number; data: Awaited<BasicProductResponse>[] }> {
+  ): Promise<{ data: Awaited<BasicProductResponse>[]; totalCount: number }> {
     const regex = new RegExp(search, 'i')
     const filters = {
       $and: [

@@ -19,8 +19,8 @@ export enum EPersonRole {
   LID = 'LID',
 }
 export enum EGender {
-  NONE = 'NONE',
   MAN = 'MAN',
+  NONE = 'NONE',
   WOMAN = 'WOMAN',
 }
 

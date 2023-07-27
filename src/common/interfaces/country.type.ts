@@ -1,8 +1,8 @@
 export enum ECountry {
-  ITALY = 'ITA',
-  FRANCE = 'FRA',
   AMERICA = 'USA',
   BELARUS = 'BLR',
+  FRANCE = 'FRA',
+  ITALY = 'ITA',
   RUSSIA = 'RUS',
 }
 

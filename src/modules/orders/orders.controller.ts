@@ -24,7 +24,7 @@ export class OrdersController {
   async create(
     @Param('ownerId') ownerId: Types.ObjectId,
     @Query('deadline') deadline: Types.ObjectId,
-    @Body() createOrderDto: Omit<CreateOrderDto, 'ownerId' | 'number' | 'date'> // TODO: удалить сумму, она будет рассчитываться исходя из стоимпости изделий
+    @Body() createOrderDto: Omit<CreateOrderDto, 'date' | 'number' | 'ownerId'> // TODO: удалить сумму, она будет рассчитываться исходя из стоимпости изделий
   ): Promise<OrderEntity> {
     try {
       const person = await this.personsService.findOne(ownerId)

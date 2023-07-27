@@ -6,8 +6,8 @@ export enum EDeliveryMethod {
   SELF_DELIVERY = 'SELF_DELIVERY',
 }
 export enum EDeliveryPlace {
-  OFFICE = 'OFFICE',
   ADDRESS = 'ADDRESS',
+  OFFICE = 'OFFICE',
 }
 
 export type TDeliveryMethod = keyof typeof EDeliveryMethod

@@ -1,6 +1,6 @@
 export enum ELeatherColor {
   BLACK = 'black',
-  RED = 'red',
   GREEN = 'green',
+  RED = 'red',
   YELLOW = 'yellow',
 }

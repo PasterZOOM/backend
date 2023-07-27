@@ -119,4 +119,4 @@ export class LeatherFactoriesController {
   }
 }
 
-type GenerateResponseFactoryParams = { locale: string; factory: LeatherFactoryDocument }
+type GenerateResponseFactoryParams = { factory: LeatherFactoryDocument; locale: string }

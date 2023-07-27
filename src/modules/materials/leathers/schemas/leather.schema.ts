@@ -3,7 +3,7 @@ import { Document, SchemaTypes, Types } from 'mongoose'
 
 import { LeatherEntity } from '../entities/leather.entity'
 
-export type LeatherDocument = Leather & Document
+export type LeatherDocument = Document & Leather
 
 @Schema()
 export class Leather implements Omit<LeatherEntity, '_id'> {

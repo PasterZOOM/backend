@@ -7,7 +7,7 @@ import { OrderEntity } from '../entities/order.entity'
 import { OrderDateEntity } from '../entities/orderDate.entity'
 import { EOrderStatus, TOrderStatus } from '../entities/orders.type'
 
-export type OrderDocument = Order & Document
+export type OrderDocument = Document & Order
 
 @Schema()
 export class Order implements Omit<OrderEntity, '_id'> {

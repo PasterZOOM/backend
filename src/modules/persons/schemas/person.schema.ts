@@ -12,7 +12,7 @@ import {
   TSubscription,
 } from '../entities/persons.type'
 
-export type PersonDocument = Person & Document
+export type PersonDocument = Document & Person
 
 @Schema()
 export class Person implements Omit<PersonEntity, '_id'> {

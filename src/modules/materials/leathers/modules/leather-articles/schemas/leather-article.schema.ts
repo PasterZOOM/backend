@@ -4,7 +4,7 @@ import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 
 import { LeatherArticleEntity } from '../entities/leather-article.entity'
 
-export type LeatherArticleDocument = LeatherArticle & Document
+export type LeatherArticleDocument = Document & LeatherArticle
 
 @Schema()
 export class LeatherArticle implements Omit<LeatherArticleEntity, '_id'> {

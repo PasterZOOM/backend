@@ -3,7 +3,7 @@ import { Document } from 'mongoose'
 
 import { ThreadEntity } from '../entities/thread.entity'
 
-export type ThreadDocument = Thread & Document
+export type ThreadDocument = Document & Thread
 
 @Schema()
 export class Thread implements Omit<ThreadEntity, '_id'> {
