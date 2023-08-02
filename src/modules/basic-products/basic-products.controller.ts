@@ -88,7 +88,6 @@ export class BasicProductsController {
           : {},
       ],
     }
-    const totalCount: number = await this.basicProductsService.countDocuments(filters)
 
     const skip = +page * +pageSize - +pageSize
 
@@ -104,26 +103,33 @@ export class BasicProductsController {
         )
       : undefined
 
-    return {
-      totalCount,
-      data: (
-        await Promise.all(
-          basicProducts.map(async product => {
-            const filteredPhotos: PhotosEntity = {}
+    const data: BasicProductResponse[] = (
+      await Promise.all(
+        basicProducts.map(async product => {
+          const filteredPhotos: PhotosEntity = {}
 
-            Object.keys(product.photos).forEach(colorId => {
-              if (colorIds && colorIds.includes(colorId)) {
-                filteredPhotos[colorId] = product.photos[colorId]
-              }
-            })
-
-            return {
-              ...(await this.generateResponseProduct({ locale, product })),
-              photos: colorIds ? filteredPhotos : product.photos,
+          Object.keys(product.photos).forEach(colorId => {
+            if (colorIds && colorIds.includes(colorId)) {
+              filteredPhotos[colorId] = product.photos[colorId]
             }
           })
-        )
-      ).filter(el => (colorIds ? el.productColors.length !== 0 : true)),
+
+          const products = await this.generateResponseProduct({ locale, product })
+
+          return {
+            ...products,
+            photos: colorIds ? filteredPhotos : product.photos,
+            productColors: colorIds
+              ? products.productColors.filter(el => colorIds.includes(String(el._id)))
+              : products.productColors,
+          }
+        })
+      )
+    ).filter(el => (colorIds ? el.productColors.length !== 0 : true))
+
+    return {
+      totalCount: data.length,
+      data,
     }
   }
 
