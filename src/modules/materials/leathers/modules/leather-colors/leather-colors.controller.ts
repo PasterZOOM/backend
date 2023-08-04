@@ -14,7 +14,8 @@ import {
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
+import { BasicProductsService } from 'src/modules/basic-products/basic-products.service'
+import { LeatherFactoriesService } from 'src/modules/materials/leathers/modules/leather-factories/leather-factories.service'
 
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 
@@ -29,7 +30,11 @@ export class LeatherColorsController {
   constructor(
     private readonly leatherColorsService: LeatherColorsService,
     @Inject(forwardRef(() => LeatherArticlesService))
-    private readonly leatherArticlesService: LeatherArticlesService
+    private readonly leatherArticlesService: LeatherArticlesService,
+    @Inject(forwardRef(() => LeatherFactoriesService))
+    private readonly leatherFactoriesService: LeatherFactoriesService,
+    @Inject(forwardRef(() => BasicProductsService))
+    private readonly basicProductsService: BasicProductsService
   ) {}
 
   @Post(':articleId')
@@ -45,7 +50,7 @@ export class LeatherColorsController {
       article: articleId,
     })
 
-    await this.leatherArticlesService.push(articleId, { colors: color._id })
+    await this.leatherArticlesService.pushColor(articleId, color._id)
 
     return this.generateResponseArticle({ locale, color })
   }
@@ -93,20 +98,16 @@ export class LeatherColorsController {
     return this.generateResponseArticle({ locale, color })
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: Types.ObjectId): Promise<void> {
-    try {
-      const color = await this.leatherColorsService.findOne(id)
-      const article = await this.leatherArticlesService.findOne(color.article)
+  @Delete(':articleId/:colorId')
+  async remove(
+    @Param('articleId') articleId: Types.ObjectId,
+    @Param('colorId') colorId: Types.ObjectId
+  ): Promise<void> {
+    await this.leatherArticlesService.pullColor(articleId, colorId)
 
-      if (article) {
-        await this.leatherArticlesService.pull(article._id, { colors: id })
-      }
+    await this.basicProductsService.deleteMany({ [`photos.${colorId}`]: { $exists: true } }) // TODO: Удалять не изделие полностью а только фотографии этого цвета из поля photos и productColors
 
-      await this.leatherColorsService.remove(id)
-    } catch (e) {
-      throw new BadIdException('address', e)
-    }
+    await this.leatherColorsService.remove(colorId)
   }
 
   async generateResponseArticle({
@@ -114,12 +115,14 @@ export class LeatherColorsController {
     color,
   }: GenerateResponseColorParams): Promise<LeatherColorResponse> {
     const article = await this.leatherArticlesService.findOne(color.article)
+    const factory = await this.leatherFactoriesService.findOne(color.factory)
 
     return {
       ...color.toJSON(),
       title: color.title[locale],
       description: color.description[locale],
       article: { _id: article.id, title: article.title[locale] },
+      factory: { _id: factory.id, title: factory.title[locale] },
     }
   }
 }

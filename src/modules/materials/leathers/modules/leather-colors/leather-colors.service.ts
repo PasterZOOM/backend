@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model, Types } from 'mongoose'
+import { FilterQuery, Model, ProjectionType, Types } from 'mongoose'
+import { LeatherFactoryDocument } from 'src/modules/materials/leathers/modules/leather-factories/schemas/leather-factory.schema'
 
 import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { UpdateLeatherColorDto } from './dto/update-leather-color.dto'
@@ -20,8 +21,11 @@ export class LeatherColorsService {
     return newLeatherColor.save()
   }
 
-  async findAll(filter?: FilterQuery<LeatherColorDocument>): Promise<LeatherColorDocument[]> {
-    return this.LeatherColorsModel.find(filter).sort().exec()
+  async findAll(
+    filter: FilterQuery<LeatherColorDocument> = {},
+    projection: ProjectionType<LeatherFactoryDocument> = undefined
+  ): Promise<LeatherColorDocument[]> {
+    return this.LeatherColorsModel.find(filter, projection).sort().exec()
   }
 
   async findOne(id: Types.ObjectId): Promise<LeatherColorDocument> {
@@ -39,5 +43,11 @@ export class LeatherColorsService {
 
   async remove(id: Types.ObjectId): Promise<LeatherColorDocument> {
     return this.LeatherColorsModel.findByIdAndRemove(id)
+  }
+
+  async deleteMany(filter: FilterQuery<LeatherColorDocument>): Promise<boolean> {
+    await this.LeatherColorsModel.deleteMany(filter)
+
+    return true
   }
 }

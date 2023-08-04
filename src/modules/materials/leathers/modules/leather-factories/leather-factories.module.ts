@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
+import { BasicProductsModule } from 'src/modules/basic-products/basic-products.module'
 import { LeatherColorsModule } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.module'
 
 import { LeatherArticlesModule } from '../leather-articles/leather-articles.module'
@@ -13,6 +14,7 @@ import { LeatherFactoryAlias, LeatherFactorySchema } from './schemas/leather-fac
     MongooseModule.forFeature([{ name: LeatherFactoryAlias, schema: LeatherFactorySchema }]),
     forwardRef(() => LeatherArticlesModule),
     forwardRef(() => LeatherColorsModule),
+    forwardRef(() => BasicProductsModule),
   ],
   controllers: [LeatherFactoriesController],
   providers: [LeatherFactoriesService],

@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model, Types } from 'mongoose'
+import { FilterQuery, Model, ProjectionType, Types } from 'mongoose'
 
 import { CreateLeatherArticleDto } from './dto/create-leather-article.dto'
 import { UpdateLeatherArticleDto } from './dto/update-leather-article.dto'
-import { LeatherArticleEntity } from './entities/leather-article.entity'
 import { LeatherArticleAlias, LeatherArticleDocument } from './schemas/leather-article.schema'
 
 @Injectable()
@@ -21,12 +20,18 @@ export class LeatherArticlesService {
     return newLeatherArticle.save()
   }
 
-  async findAll(filters?: FilterQuery<LeatherArticleDocument>): Promise<LeatherArticleDocument[]> {
-    return this.LeatherArticleModel.find(filters).sort().exec()
+  async findAll(
+    filters: FilterQuery<LeatherArticleDocument> = {},
+    projection: ProjectionType<LeatherArticleDocument> = undefined
+  ): Promise<LeatherArticleDocument[]> {
+    return this.LeatherArticleModel.find(filters, projection).sort().exec()
   }
 
-  async findOne(id: Types.ObjectId): Promise<LeatherArticleDocument> {
-    return this.LeatherArticleModel.findById(id)
+  async findOne(
+    id: Types.ObjectId,
+    projection: ProjectionType<LeatherArticleDocument> = undefined
+  ): Promise<LeatherArticleDocument> {
+    return this.LeatherArticleModel.findById(id, projection)
   }
 
   async find(filter: FilterQuery<LeatherArticleDocument>): Promise<LeatherArticleDocument> {
@@ -46,19 +51,25 @@ export class LeatherArticlesService {
     return this.LeatherArticleModel.findByIdAndRemove(id)
   }
 
-  async push(
-    id: Types.ObjectId,
-    addToSet: { [key in keyof Partial<Pick<LeatherArticleEntity, 'colors'>>]: Types.ObjectId }
-  ): Promise<LeatherArticleDocument> {
-    await this.LeatherArticleModel.findByIdAndUpdate(id, { $addToSet: addToSet })
+  async deleteMany(filter: FilterQuery<LeatherArticleDocument>): Promise<boolean> {
+    await this.LeatherArticleModel.deleteMany(filter)
 
-    return this.findOne(id)
+    return true
   }
 
-  async pull(
-    id: Types.ObjectId,
-    pulled: { [key in keyof Partial<Pick<LeatherArticleEntity, 'colors'>>]: Types.ObjectId }
+  async pushColor(
+    articleId: Types.ObjectId,
+    colorId: Types.ObjectId
   ): Promise<LeatherArticleDocument> {
-    return this.LeatherArticleModel.findByIdAndUpdate(id, { $pull: pulled })
+    await this.LeatherArticleModel.findByIdAndUpdate(articleId, { $addToSet: { colors: colorId } })
+
+    return this.findOne(articleId)
+  }
+
+  async pullColor(
+    articleId: Types.ObjectId,
+    colorId: Types.ObjectId
+  ): Promise<LeatherArticleDocument> {
+    return this.LeatherArticleModel.findByIdAndUpdate(articleId, { $pull: { colors: colorId } })
   }
 }

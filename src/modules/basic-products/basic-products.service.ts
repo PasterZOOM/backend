@@ -6,8 +6,6 @@ import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
 import { BasicProductAlias, BasicProductDocument } from './schemas/basic-product.schema'
 
-const DEFAULT_LIMIT = 9
-
 @Injectable()
 export class BasicProductsService {
   constructor(
@@ -20,7 +18,7 @@ export class BasicProductsService {
 
   async findAll(
     filters?: FilterQuery<BasicProductDocument>,
-    limit = DEFAULT_LIMIT,
+    limit = undefined,
     skip = 0
   ): Promise<BasicProductDocument[]> {
     return this.BasicProductModel.find(filters).limit(+limit).skip(+skip)
@@ -43,7 +41,9 @@ export class BasicProductsService {
     return this.BasicProductModel.findByIdAndRemove(id)
   }
 
-  async countDocuments(filters?: FilterQuery<BasicProductDocument>): Promise<number> {
-    return this.BasicProductModel.countDocuments(filters).exec()
+  async deleteMany(filter: FilterQuery<BasicProductDocument>): Promise<boolean> {
+    await this.BasicProductModel.deleteMany(filter)
+
+    return true
   }
 }

@@ -13,6 +13,7 @@ import {
 import { ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
+import { BasicProductsService } from 'src/modules/basic-products/basic-products.service'
 
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 import { LeatherColorsService } from '../leather-colors/leather-colors.service'
@@ -31,7 +32,9 @@ export class LeatherFactoriesController {
     @Inject(forwardRef(() => LeatherColorsService))
     private readonly leatherColorService: LeatherColorsService,
     @Inject(forwardRef(() => LeatherArticlesService))
-    private readonly leatherArticlesService: LeatherArticlesService
+    private readonly leatherArticlesService: LeatherArticlesService,
+    @Inject(forwardRef(() => BasicProductsService))
+    private readonly basicProductsService: BasicProductsService
   ) {}
 
   @Post()
@@ -87,17 +90,9 @@ export class LeatherFactoriesController {
 
   @Delete(':id')
   async remove(@Param('id') id: Types.ObjectId): Promise<void> {
-    const factory = await this.leatherFactoriesService.findOne(id)
-
-    await Promise.all(
-      factory.articles.map(async article => {
-        const { colors } = await this.leatherArticlesService.findOne(article)
-
-        await Promise.all(colors.map(color => this.leatherColorService.remove(color)))
-
-        return this.leatherArticlesService.remove(article)
-      })
-    )
+    await this.basicProductsService.deleteMany({ 'leather.factory': id })
+    await this.leatherArticlesService.deleteMany({ factory: id })
+    await this.leatherColorService.deleteMany({ factory: id })
 
     await this.leatherFactoriesService.remove(id)
   }
@@ -107,7 +102,7 @@ export class LeatherFactoriesController {
     factory,
   }: GenerateResponseFactoryParams): Promise<LeatherFactoryResponse> {
     const articles = (
-      await this.leatherArticlesService.findAll({ _id: { $in: factory.articles } })
+      await this.leatherArticlesService.findAll({ _id: { $in: factory.articles } }, { title: true })
     ).map(({ _id, title }) => ({ _id, title: title[locale] }))
 
     return {

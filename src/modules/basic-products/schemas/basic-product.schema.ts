@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document, SchemaTypes, Types } from 'mongoose'
+import { Document } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECost } from 'src/common/interfaces/cost.type'
+import { BasicProductLeather } from 'src/modules/basic-products/entities/basic-product-leather.emtity'
 import { PhotosEntity } from 'src/modules/basic-products/entities/photo.entity'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
 
@@ -21,8 +22,8 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ default: {} })
   description: LocaleFieldEntity
 
-  @Prop({ type: SchemaTypes.ObjectId, default: '' })
-  leather: Types.ObjectId
+  @Prop({ type: BasicProductLeather, default: '' })
+  leather: BasicProductLeather
 
   @Prop({ default: EPunchPitch.LITTLE })
   punchPitch: EPunchPitch

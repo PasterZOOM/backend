@@ -12,6 +12,9 @@ export class LeatherColor implements Omit<LeatherColorEntity, '_id'> {
   @Prop({ type: SchemaTypes.ObjectId, default: '' })
   article: Types.ObjectId
 
+  @Prop({ type: SchemaTypes.ObjectId, default: '' })
+  factory: Types.ObjectId
+
   @Prop({ default: '' })
   code: string
 

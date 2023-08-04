@@ -16,6 +16,12 @@ export class LeatherColorEntity {
 
   @ApiProperty({
     type: String,
+    description: 'идентификационный номер фабрики под артикулом которой выпускается данный цвет',
+  })
+  factory: Types.ObjectId
+
+  @ApiProperty({
+    type: String,
     description: 'код цвета кожи',
   })
   code: string

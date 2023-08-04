@@ -7,6 +7,7 @@ export class LeatherColorResponse extends OmitType(LeatherColorEntity, [
   'description',
   'title',
   'article',
+  'factory',
 ]) {
   @ApiProperty({
     type: String,
@@ -19,4 +20,10 @@ export class LeatherColorResponse extends OmitType(LeatherColorEntity, [
 
   @ApiProperty({ type: BasEntity, description: 'артикул к которому относится цвет' })
   article: BasEntity
+
+  @ApiProperty({
+    type: BasEntity,
+    description: 'фабрика к которой относится артикул к которому относится цвет',
+  })
+  factory: BasEntity
 }

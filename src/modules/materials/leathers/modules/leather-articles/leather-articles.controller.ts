@@ -14,16 +14,17 @@ import {
 import { ApiTags } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { UpdateLeatherArticleDto } from 'src/modules/materials/leathers/modules/leather-articles/dto/update-leather-article.dto'
-import { LeatherArticleDocument } from 'src/modules/materials/leathers/modules/leather-articles/schemas/leather-article.schema'
+import { BasicProductsService } from 'src/modules/basic-products/basic-products.service'
 
 import { LeatherColorsService } from '../leather-colors/leather-colors.service'
 import { LeatherFactoriesService } from '../leather-factories/leather-factories.service'
 
 import { CreateLeatherArticleDto } from './dto/create-leather-article.dto'
 import { LeatherArticleResponse } from './dto/leather-article-responce.dto'
+import { UpdateLeatherArticleDto } from './dto/update-leather-article.dto'
 import { LeatherArticleEntity } from './entities/leather-article.entity'
 import { LeatherArticlesService } from './leather-articles.service'
+import { LeatherArticleDocument } from './schemas/leather-article.schema'
 
 @ApiTags('Leather-articles')
 @Controller('leather-articles')
@@ -33,7 +34,9 @@ export class LeatherArticlesController {
     @Inject(forwardRef(() => LeatherColorsService))
     private readonly leatherColorService: LeatherColorsService,
     @Inject(forwardRef(() => LeatherFactoriesService))
-    private readonly leatherFactoriesService: LeatherFactoriesService
+    private readonly leatherFactoriesService: LeatherFactoriesService,
+    @Inject(forwardRef(() => BasicProductsService))
+    private readonly basicProductsService: BasicProductsService
   ) {}
 
   @Post(':factoryId')
@@ -49,7 +52,7 @@ export class LeatherArticlesController {
       ...createLeatherArticle,
     })
 
-    await this.leatherFactoriesService.push(factoryId, { articles: article._id })
+    await this.leatherFactoriesService.pushArticle(factoryId, article._id)
 
     return this.generateResponseArticle({ locale, article })
   }
@@ -94,17 +97,17 @@ export class LeatherArticlesController {
     return this.generateResponseArticle({ locale, article })
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: Types.ObjectId): Promise<void> {
-    const article = await this.leatherArticlesService.findOne(id)
-    const factory = await this.leatherFactoriesService.findOne(article.factory)
+  @Delete(':factoryId/:articleId')
+  async remove(
+    @Param('factoryId') factoryId: Types.ObjectId,
+    @Param('articleId') articleId: Types.ObjectId
+  ): Promise<void> {
+    await this.leatherFactoriesService.pullArticle(factoryId, articleId)
 
-    if (factory) {
-      await this.leatherFactoriesService.pull(factory._id, { articles: id })
-    }
-    await Promise.all(article.colors.map(color => this.leatherColorService.remove(color)))
+    await this.leatherColorService.deleteMany({ article: articleId })
+    await this.basicProductsService.deleteMany({ 'leather.article': articleId })
 
-    await this.leatherArticlesService.remove(id)
+    await this.leatherArticlesService.remove(articleId)
   }
 
   async generateResponseArticle({
@@ -113,9 +116,9 @@ export class LeatherArticlesController {
   }: GenerateResponseArticleParams): Promise<LeatherArticleResponse> {
     const factory = await this.leatherFactoriesService.findOne(article.factory)
 
-    const colors = (await this.leatherColorService.findAll({ _id: { $in: article.colors } })).map(
-      ({ _id, title }) => ({ _id, title: title[locale] })
-    )
+    const colors = (
+      await this.leatherColorService.findAll({ _id: { $in: article.colors } }, { title: true })
+    ).map(({ _id, title }) => ({ _id, title: title[locale] }))
 
     return {
       ...article.toJSON(),
@@ -127,7 +130,4 @@ export class LeatherArticlesController {
   }
 }
 
-type GenerateResponseArticleParams = {
-  article: LeatherArticleDocument
-  locale: string
-}
+type GenerateResponseArticleParams = { article: LeatherArticleDocument; locale: string }

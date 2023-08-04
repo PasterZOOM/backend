@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger'
-import { BasEntity } from 'src/common/entities/base.entity'
+import { BasicProductLeatherResponse } from 'src/modules/basic-products/entities/basic-product-leather-response.emtity'
 
 import { BasicProductColor } from '../entities/basic-product-color.entity'
 import { BasicProductEntity } from '../entities/basic-product.entity'
@@ -28,8 +28,11 @@ export class BasicProductResponse extends OmitType(BasicProductEntity, [
   })
   description: string
 
-  @ApiProperty({ type: BasEntity, description: 'Из какой кожи изготовлено изделие' })
-  leather: BasEntity
+  @ApiProperty({
+    type: BasicProductLeatherResponse,
+    description: 'Из какой кожи изготовлено изделие',
+  })
+  leather: BasicProductLeatherResponse
 
   @ApiProperty({ type: [BasicProductColor], description: 'В каких цветах существует изделие' })
   productColors: BasicProductColor[]

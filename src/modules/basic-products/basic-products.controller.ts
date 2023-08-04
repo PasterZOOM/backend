@@ -16,6 +16,7 @@ import { v1 } from 'uuid'
 
 import { LeatherArticlesService } from '../materials/leathers/modules/leather-articles/leather-articles.service'
 import { LeatherColorsService } from '../materials/leathers/modules/leather-colors/leather-colors.service'
+import { LeatherFactoriesService } from '../materials/leathers/modules/leather-factories/leather-factories.service'
 
 import { BasicProductsService } from './basic-products.service'
 import { BasicProductResponse } from './dto/basic-product-response.dto'
@@ -32,7 +33,8 @@ export class BasicProductsController {
   constructor(
     private readonly basicProductsService: BasicProductsService,
     private readonly leatherColorsService: LeatherColorsService,
-    private readonly leatherArticlesService: LeatherArticlesService
+    private readonly leatherArticlesService: LeatherArticlesService,
+    private readonly leatherFactoriesService: LeatherFactoriesService
   ) {}
 
   @Post()
@@ -74,7 +76,7 @@ export class BasicProductsController {
         leathers
           ? {
               $or: (await this.leatherArticlesService.findAll({ value: { $in: leathers } })).map(
-                ({ _id }) => ({ leather: _id })
+                ({ _id }) => ({ 'leather.article': _id })
               ),
             }
           : {},
@@ -229,8 +231,17 @@ export class BasicProductsController {
       .map(({ _id, photo, title }) => ({ _id, photo, title: title[locale] }))
       .sort((a, b) => (a.title > b.title ? 1 : -1))
 
-    const leatherArticle = await this.leatherArticlesService.findOne(product.leather)
-    const leather = { _id: leatherArticle._id, title: leatherArticle.title[locale] }
+    const leatherArticle = await this.leatherArticlesService.findOne(product.leather.article, {
+      title: true,
+    })
+    const leatherFactory = await this.leatherFactoriesService.findOne(product.leather.factory, {
+      title: true,
+    })
+
+    const leather = {
+      article: { _id: leatherArticle._id, title: leatherArticle.title[locale] },
+      factory: { _id: leatherFactory._id, title: leatherFactory.title[locale] },
+    }
 
     return {
       ...product.toJSON(),

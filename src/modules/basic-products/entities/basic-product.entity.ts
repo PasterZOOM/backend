@@ -2,6 +2,7 @@ import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
 import { ECost } from 'src/common/interfaces/cost.type'
+import { BasicProductLeather } from 'src/modules/basic-products/entities/basic-product-leather.emtity'
 import { BasicProductPhotoEntity } from 'src/modules/basic-products/entities/basic-product-photo.entity'
 import { EPunchPitch } from 'src/modules/materials/common/materials.type'
 import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
@@ -41,10 +42,10 @@ export class BasicProductEntity {
   description: LocaleFieldEntity
 
   @ApiProperty({
-    type: String,
-    description: 'идентификационный номер артикула кожи из которой сделано базовое изделие',
+    type: BasicProductLeather,
+    description: 'информация о коже из которой сделано базовое изделие',
   })
-  leather: Types.ObjectId
+  leather: BasicProductLeather
 
   @ApiProperty({
     type: Object,

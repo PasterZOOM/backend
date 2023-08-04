@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model, Types } from 'mongoose'
+import { FilterQuery, Model, ProjectionType, Types } from 'mongoose'
 
 import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
 import { UpdateLeatherFactoryDto } from './dto/update-leather-factory.dto'
@@ -19,12 +19,18 @@ export class LeatherFactoriesService {
     return newLeatherFactory.save()
   }
 
-  async findAll(): Promise<LeatherFactoryDocument[]> {
-    return this.LeatherFactoryModel.find().sort().exec()
+  async findAll(
+    filters: FilterQuery<LeatherFactoryDocument> = {},
+    projection: ProjectionType<LeatherFactoryDocument> = undefined
+  ): Promise<LeatherFactoryDocument[]> {
+    return this.LeatherFactoryModel.find(filters, projection).sort().exec()
   }
 
-  async findOne(id: Types.ObjectId): Promise<LeatherFactoryDocument> {
-    return this.LeatherFactoryModel.findById(id)
+  async findOne(
+    id: Types.ObjectId,
+    projection: ProjectionType<LeatherFactoryDocument> = undefined
+  ): Promise<LeatherFactoryDocument> {
+    return this.LeatherFactoryModel.findById(id, projection)
   }
 
   async update(
@@ -40,17 +46,19 @@ export class LeatherFactoriesService {
     return this.LeatherFactoryModel.findByIdAndRemove(id)
   }
 
-  async push(
-    id: Types.ObjectId,
-    addToSet: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: Types.ObjectId }
+  async pushArticle(
+    factoryId: Types.ObjectId,
+    articleId: Types.ObjectId
   ): Promise<LeatherFactoryDocument> {
-    return this.LeatherFactoryModel.findByIdAndUpdate(id, { $addToSet: addToSet })
+    return this.LeatherFactoryModel.findByIdAndUpdate(factoryId, {
+      $addToSet: { articles: articleId },
+    })
   }
 
-  async pull(
-    id: Types.ObjectId,
-    pulled: { [key in keyof Partial<Pick<LeatherFactoryEntity, 'articles'>>]: Types.ObjectId }
+  async pullArticle(
+    factoryId: Types.ObjectId,
+    articleId: Types.ObjectId
   ): Promise<LeatherFactoryEntity> {
-    return this.LeatherFactoryModel.findByIdAndUpdate(id, { $pull: pulled })
+    return this.LeatherFactoryModel.findByIdAndUpdate(factoryId, { $pull: { articles: articleId } })
   }
 }
