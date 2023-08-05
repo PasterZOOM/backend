@@ -91,6 +91,7 @@ export class LeatherFactoriesController {
   @Delete(':id')
   async remove(@Param('id') id: Types.ObjectId): Promise<void> {
     await this.basicProductsService.deleteMany({ 'leather.factory': id })
+
     await this.leatherArticlesService.deleteMany({ factory: id })
     await this.leatherColorService.deleteMany({ factory: id })
 
@@ -102,7 +103,7 @@ export class LeatherFactoriesController {
     factory,
   }: GenerateResponseFactoryParams): Promise<LeatherFactoryResponse> {
     const articles = (
-      await this.leatherArticlesService.findAll({ _id: { $in: factory.articles } }, { title: true })
+      await this.leatherArticlesService.findAll({ factory: factory._id }, { title: true })
     ).map(({ _id, title }) => ({ _id, title: title[locale] }))
 
     return {

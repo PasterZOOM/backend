@@ -6,7 +6,6 @@ export class LeatherArticleResponse extends OmitType(LeatherArticleEntity, [
   'title',
   'description',
   'factory',
-  'colors',
 ]) {
   @ApiProperty({ type: String, description: 'описание артикула' })
   description: string

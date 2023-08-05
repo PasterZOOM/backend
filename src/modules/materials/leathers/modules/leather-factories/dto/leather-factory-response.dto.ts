@@ -4,7 +4,6 @@ import { BasEntity } from 'src/common/entities/base.entity'
 import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
 
 export class LeatherFactoryResponse extends OmitType(LeatherFactoryEntity, [
-  'articles',
   'title',
   'description',
 ]) {

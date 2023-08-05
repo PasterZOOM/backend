@@ -50,8 +50,6 @@ export class LeatherColorsController {
       article: articleId,
     })
 
-    await this.leatherArticlesService.pushColor(articleId, color._id)
-
     return this.generateResponseArticle({ locale, color })
   }
 
@@ -103,9 +101,19 @@ export class LeatherColorsController {
     @Param('articleId') articleId: Types.ObjectId,
     @Param('colorId') colorId: Types.ObjectId
   ): Promise<void> {
-    await this.leatherArticlesService.pullColor(articleId, colorId)
+    const products = await this.basicProductsService.findAll({
+      [`photos.${colorId}`]: { $exists: true },
+    })
 
-    await this.basicProductsService.deleteMany({ [`photos.${colorId}`]: { $exists: true } }) // TODO: Удалять не изделие полностью а только фотографии этого цвета из поля photos и productColors
+    await Promise.all(
+      products.map(async product => {
+        const photos = { ...product.photos }
+
+        delete photos[colorId.toString()]
+
+        await this.basicProductsService.update(product._id, { photos })
+      })
+    )
 
     await this.leatherColorsService.remove(colorId)
   }

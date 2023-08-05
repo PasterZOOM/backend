@@ -52,8 +52,6 @@ export class LeatherArticlesController {
       ...createLeatherArticle,
     })
 
-    await this.leatherFactoriesService.pushArticle(factoryId, article._id)
-
     return this.generateResponseArticle({ locale, article })
   }
 
@@ -102,8 +100,6 @@ export class LeatherArticlesController {
     @Param('factoryId') factoryId: Types.ObjectId,
     @Param('articleId') articleId: Types.ObjectId
   ): Promise<void> {
-    await this.leatherFactoriesService.pullArticle(factoryId, articleId)
-
     await this.leatherColorService.deleteMany({ article: articleId })
     await this.basicProductsService.deleteMany({ 'leather.article': articleId })
 
@@ -117,7 +113,7 @@ export class LeatherArticlesController {
     const factory = await this.leatherFactoriesService.findOne(article.factory)
 
     const colors = (
-      await this.leatherColorService.findAll({ _id: { $in: article.colors } }, { title: true })
+      await this.leatherColorService.findAll({ article: article._id }, { title: true })
     ).map(({ _id, title }) => ({ _id, title: title[locale] }))
 
     return {

@@ -4,7 +4,6 @@ import { FilterQuery, Model, ProjectionType, Types } from 'mongoose'
 
 import { CreateLeatherFactoryDto } from './dto/create-leather-factory.dto'
 import { UpdateLeatherFactoryDto } from './dto/update-leather-factory.dto'
-import { LeatherFactoryEntity } from './entities/leather-factory.entity'
 import { LeatherFactoryAlias, LeatherFactoryDocument } from './schemas/leather-factory.schema'
 
 @Injectable()
@@ -44,21 +43,5 @@ export class LeatherFactoriesService {
 
   async remove(id: Types.ObjectId): Promise<LeatherFactoryDocument> {
     return this.LeatherFactoryModel.findByIdAndRemove(id)
-  }
-
-  async pushArticle(
-    factoryId: Types.ObjectId,
-    articleId: Types.ObjectId
-  ): Promise<LeatherFactoryDocument> {
-    return this.LeatherFactoryModel.findByIdAndUpdate(factoryId, {
-      $addToSet: { articles: articleId },
-    })
-  }
-
-  async pullArticle(
-    factoryId: Types.ObjectId,
-    articleId: Types.ObjectId
-  ): Promise<LeatherFactoryEntity> {
-    return this.LeatherFactoryModel.findByIdAndUpdate(factoryId, { $pull: { articles: articleId } })
   }
 }

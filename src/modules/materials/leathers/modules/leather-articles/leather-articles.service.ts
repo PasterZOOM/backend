@@ -56,20 +56,4 @@ export class LeatherArticlesService {
 
     return true
   }
-
-  async pushColor(
-    articleId: Types.ObjectId,
-    colorId: Types.ObjectId
-  ): Promise<LeatherArticleDocument> {
-    await this.LeatherArticleModel.findByIdAndUpdate(articleId, { $addToSet: { colors: colorId } })
-
-    return this.findOne(articleId)
-  }
-
-  async pullColor(
-    articleId: Types.ObjectId,
-    colorId: Types.ObjectId
-  ): Promise<LeatherArticleDocument> {
-    return this.LeatherArticleModel.findByIdAndUpdate(articleId, { $pull: { colors: colorId } })
-  }
 }

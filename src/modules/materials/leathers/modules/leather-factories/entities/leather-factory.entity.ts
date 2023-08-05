@@ -11,12 +11,6 @@ export class LeatherFactoryEntity {
   _id: Types.ObjectId
 
   @ApiProperty({
-    type: [String],
-    description: 'идентификационные номера артиклей производимых фабрикой',
-  })
-  articles: Types.ObjectId[]
-
-  @ApiProperty({
     enum: ECountry,
     enumName: 'ECountry',
     description: 'страна в которой находиться фабрика',
