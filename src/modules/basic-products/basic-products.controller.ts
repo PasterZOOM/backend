@@ -11,7 +11,9 @@ import {
   Query,
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
-import { Types } from 'mongoose'
+import { FilterQuery, Types } from 'mongoose'
+import { LeatherArticleDocument } from 'src/modules/materials/leathers/modules/leather-articles/schemas/leather-article.schema'
+import { LeatherColorDocument } from 'src/modules/materials/leathers/modules/leather-colors/schemas/leather-color.schema'
 import { v1 } from 'uuid'
 
 import { LeatherArticlesService } from '../materials/leathers/modules/leather-articles/leather-articles.service'
@@ -20,11 +22,10 @@ import { LeatherFactoriesService } from '../materials/leathers/modules/leather-f
 
 import { BasicProductsService } from './basic-products.service'
 import { BasicProductResponse } from './dto/basic-product-response.dto'
-import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
 import { BasicProductColor } from './entities/basic-product-color.entity'
 import { EFilterKeys } from './entities/basic-product.type'
-import { PhotosEntity } from './entities/photo.entity'
+import { CreateBasicProductResponse } from './entities/create-basic-product-response.entity'
 import { BasicProductDocument } from './schemas/basic-product.schema'
 
 @ApiTags('Basic-products')
@@ -39,7 +40,14 @@ export class BasicProductsController {
 
   @Post()
   async create(
-    @Body() { title, description, size, ...createBasicProductDto }: CreateBasicProductDto,
+    @Body()
+    {
+      title,
+      description,
+      size,
+      leather: { article, factory },
+      ...createBasicProductDto
+    }: CreateBasicProductResponse,
     @Headers() { 'x-accept-language': locale }
   ): Promise<BasicProductResponse> {
     const product = await this.basicProductsService.create({
@@ -47,6 +55,10 @@ export class BasicProductsController {
       title: { en: '', ru: '', [locale]: title },
       description: { en: '', ru: '', [locale]: description },
       size: { en: '', ru: '', [locale]: size },
+      leather: {
+        article: Types.ObjectId.createFromHexString(article),
+        factory: Types.ObjectId.createFromHexString(factory),
+      },
     })
 
     return this.generateResponseProduct({ locale, product })
@@ -66,18 +78,35 @@ export class BasicProductsController {
     @Query(EFilterKeys.LEATHERS) leathers?: string[] | string,
     @Query(EFilterKeys.SEARCH) search?: string,
     @Query(EFilterKeys.PAGE) page = '1',
-    @Query(EFilterKeys.PAGE_SIZE) pageSize = '9'
+    @Query(EFilterKeys.PAGE_SIZE) pageSize: string = undefined
   ): Promise<{ data: Awaited<BasicProductResponse>[]; totalCount: number }> {
+    const colorIds: Pick<LeatherColorDocument, '_id'>[] | undefined = leatherColors
+      ? await this.leatherColorsService.findAll({ value: { $in: leatherColors } }, { _id: true })
+      : undefined
+
+    if (leatherColors && !colorIds?.length) {
+      return {
+        data: [],
+        totalCount: 0,
+      }
+    }
+
+    const leathersId: Pick<LeatherArticleDocument, '_id'>[] | undefined = leathers
+      ? await this.leatherArticlesService.findAll({ value: { $in: leathers } }, { _id: true })
+      : undefined
+
     const regex = new RegExp(search, 'i')
-    const filters = {
+
+    const filters: FilterQuery<BasicProductDocument> = {
       $and: [
-        categories ? { $or: [categories].flat().map(category => ({ category })) } : {},
-        assignments ? { $or: [assignments].flat().map(assignments => ({ assignments })) } : {},
-        leathers
+        categories ? { category: { $in: [categories].flat() } } : {},
+        assignments ? { assignments: { $in: [assignments].flat() } } : {},
+        leathersId?.length ? { 'leather.article': { $in: leathersId.map(({ _id }) => _id) } } : {},
+        colorIds?.length
           ? {
-              $or: (await this.leatherArticlesService.findAll({ value: { $in: leathers } })).map(
-                ({ _id }) => ({ 'leather.article': _id })
-              ),
+              $or: colorIds.map(color => ({
+                [`photos.${color._id.toString()}`]: { $exists: true },
+              })),
             }
           : {},
         search
@@ -99,39 +128,37 @@ export class BasicProductsController {
       skip
     )
 
-    const colorIds = leatherColors
-      ? (await this.leatherColorsService.findAll({ value: { $in: leatherColors } })).map(color =>
-          color._id.toString()
-        )
-      : undefined
+    const totalCount: number = await this.basicProductsService.countDocuments(filters)
 
-    const data: BasicProductResponse[] = (
-      await Promise.all(
-        basicProducts.map(async product => {
-          const filteredPhotos: PhotosEntity = {}
+    const data = await Promise.all(
+      basicProducts.map(async product => {
+        const prod = await this.generateResponseProduct({ locale, product })
 
-          Object.keys(product.photos).forEach(colorId => {
-            if (colorIds && colorIds.includes(colorId)) {
-              filteredPhotos[colorId] = product.photos[colorId]
+        if (leatherColors) {
+          const { photos } = prod
+
+          const productColors = prod.productColors.filter(color => {
+            const colorId = color._id.toString()
+
+            if (!colorIds.some(el => el._id.toString() === colorId)) {
+              delete photos[colorId]
+
+              return false
             }
+
+            return true
           })
 
-          const products = await this.generateResponseProduct({ locale, product })
+          return { ...prod, photos, productColors }
+        }
 
-          return {
-            ...products,
-            photos: colorIds ? filteredPhotos : product.photos,
-            productColors: colorIds
-              ? products.productColors.filter(el => colorIds.includes(String(el._id)))
-              : products.productColors,
-          }
-        })
-      )
-    ).filter(el => (colorIds ? el.productColors.length !== 0 : true))
+        return prod
+      })
+    )
 
     return {
-      totalCount: data.length,
       data,
+      totalCount,
     }
   }
 

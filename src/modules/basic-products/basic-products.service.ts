@@ -21,7 +21,7 @@ export class BasicProductsService {
     limit = undefined,
     skip = 0
   ): Promise<BasicProductDocument[]> {
-    return this.BasicProductModel.find(filters).limit(+limit).skip(+skip)
+    return this.BasicProductModel.find(filters).limit(+limit).skip(skip)
   }
 
   async findOne(id: Types.ObjectId): Promise<BasicProductDocument> {
@@ -45,5 +45,9 @@ export class BasicProductsService {
     await this.BasicProductModel.deleteMany(filter)
 
     return true
+  }
+
+  async countDocuments(filters?: FilterQuery<BasicProductDocument>): Promise<number> {
+    return this.BasicProductModel.countDocuments(filters).exec()
   }
 }
