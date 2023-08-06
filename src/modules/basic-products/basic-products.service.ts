@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { FilterQuery, Model, Types } from 'mongoose'
+import { FilterQuery, Model, SortOrder, Types } from 'mongoose'
+import { ESort } from 'src/modules/basic-products/entities/basic-product.type'
 
 import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
@@ -19,9 +20,15 @@ export class BasicProductsService {
   async findAll(
     filters?: FilterQuery<BasicProductDocument>,
     limit = undefined,
-    skip = 0
+    skip = 0,
+    sort = ESort.NEW_FIRSTS
   ): Promise<BasicProductDocument[]> {
-    return this.BasicProductModel.find(filters).limit(+limit).skip(skip)
+    const [key, value] = sort.toString().split('_') as [string, SortOrder]
+
+    return this.BasicProductModel.find(filters)
+      .limit(+limit)
+      .skip(skip)
+      .sort({ [key === 'date' ? '_id' : key]: value })
   }
 
   async findOne(id: Types.ObjectId): Promise<BasicProductDocument> {

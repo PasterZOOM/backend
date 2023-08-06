@@ -24,7 +24,7 @@ import { BasicProductsService } from './basic-products.service'
 import { BasicProductResponse } from './dto/basic-product-response.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'
 import { BasicProductColor } from './entities/basic-product-color.entity'
-import { EFilterKeys } from './entities/basic-product.type'
+import { EFilterKeys, ESort } from './entities/basic-product.type'
 import { CreateBasicProductResponse } from './entities/create-basic-product-response.entity'
 import { BasicProductDocument } from './schemas/basic-product.schema'
 
@@ -78,7 +78,8 @@ export class BasicProductsController {
     @Query(EFilterKeys.LEATHERS) leathers?: string[] | string,
     @Query(EFilterKeys.SEARCH) search?: string,
     @Query(EFilterKeys.PAGE) page = '1',
-    @Query(EFilterKeys.PAGE_SIZE) pageSize: string = undefined
+    @Query(EFilterKeys.PAGE_SIZE) pageSize: string = undefined,
+    @Query(EFilterKeys.SORT) sort: ESort = ESort.NEW_FIRSTS
   ): Promise<{ data: Awaited<BasicProductResponse>[]; totalCount: number }> {
     const colorIds: Pick<LeatherColorDocument, '_id'>[] | undefined = leatherColors
       ? await this.leatherColorsService.findAll({ value: { $in: leatherColors } }, { _id: true })
@@ -125,7 +126,8 @@ export class BasicProductsController {
     const basicProducts: BasicProductDocument[] = await this.basicProductsService.findAll(
       filters,
       +pageSize,
-      skip
+      skip,
+      sort
     )
 
     const totalCount: number = await this.basicProductsService.countDocuments(filters)
