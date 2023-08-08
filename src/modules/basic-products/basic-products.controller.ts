@@ -79,15 +79,28 @@ export class BasicProductsController {
     @Query(EFilterKeys.SEARCH) search?: string,
     @Query(EFilterKeys.PAGE) page = '1',
     @Query(EFilterKeys.PAGE_SIZE) pageSize: string = undefined,
+    @Query(EFilterKeys.MIN_PRICE) minPrice: string = undefined,
+    @Query(EFilterKeys.MAX_PRICE) maxPrice: string = undefined,
     @Query(EFilterKeys.SORT) sort: ESort = ESort.NEW_FIRSTS
-  ): Promise<{ data: Awaited<BasicProductResponse>[]; totalCount: number }> {
+  ): Promise<{
+    data: Awaited<BasicProductResponse>[]
+    maxPrice: number
+    minPrice: number
+    totalCount: number
+  }> {
+    // TODO: написать типизацию для сввагера
     const colorIds: Pick<LeatherColorDocument, '_id'>[] | undefined = leatherColors
       ? await this.leatherColorsService.findAll({ value: { $in: leatherColors } }, { _id: true })
       : undefined
 
+    const minPriceInDB = await this.basicProductsService.getMinCost()
+    const maxPriceInDB = await this.basicProductsService.getMaxCost()
+
     if (leatherColors && !colorIds?.length) {
       return {
         data: [],
+        maxPrice: maxPriceInDB,
+        minPrice: minPriceInDB,
         totalCount: 0,
       }
     }
@@ -118,6 +131,8 @@ export class BasicProductsController {
               ],
             }
           : {},
+        minPrice ? { cost: { $gt: +minPrice } } : {},
+        maxPrice ? { cost: { $lt: +maxPrice } } : {},
       ],
     }
 
@@ -160,6 +175,8 @@ export class BasicProductsController {
 
     return {
       data,
+      maxPrice: maxPriceInDB,
+      minPrice: minPriceInDB,
       totalCount,
     }
   }

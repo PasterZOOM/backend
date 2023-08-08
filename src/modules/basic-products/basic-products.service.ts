@@ -57,4 +57,12 @@ export class BasicProductsService {
   async countDocuments(filters?: FilterQuery<BasicProductDocument>): Promise<number> {
     return this.BasicProductModel.countDocuments(filters).exec()
   }
+
+  async getMinCost(): Promise<number> {
+    return (await this.BasicProductModel.find().sort({ cost: 1 }).limit(1))[0].cost
+  }
+
+  async getMaxCost(): Promise<number> {
+    return (await this.BasicProductModel.find().sort({ cost: -1 }).limit(1))[0].cost
+  }
 }

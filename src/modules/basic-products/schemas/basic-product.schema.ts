@@ -28,9 +28,6 @@ export class BasicProduct implements Omit<BasicProductEntity, '_id'> {
   @Prop({ default: EPunchPitch.LITTLE })
   punchPitch: EPunchPitch
 
-  @Prop({ default: ECost.EUR })
-  costCurrency: ECost
-
   @Prop({ default: {} })
   size: LocaleFieldEntity
 

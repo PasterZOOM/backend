@@ -1,7 +1,6 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import { Types } from 'mongoose'
 import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { ECost } from 'src/common/interfaces/cost.type'
 import { BasicProductLeather } from 'src/modules/basic-products/entities/basic-product-leather.emtity'
 import { BasicProductPhotoEntity } from 'src/modules/basic-products/entities/basic-product-photo.entity'
 import { EPunchPitch } from 'src/modules/materials/common/materials.type'
@@ -30,13 +29,6 @@ export class BasicProductEntity {
 
   @ApiProperty({ type: Number, description: 'цена изделия' })
   cost: number
-
-  @ApiProperty({
-    enum: ECost,
-    enumName: 'ECost',
-    description: 'валюта в которой представлена цена на изделие',
-  })
-  costCurrency: ECost
 
   @ApiProperty({ type: LocaleFieldEntity, description: 'описание базового изделия' })
   description: LocaleFieldEntity

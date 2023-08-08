@@ -3,6 +3,8 @@ export enum EFilterKeys {
   CATEGORIES = 'categories',
   LEATHERS = 'leathers',
   LEATHER_COLORS = 'leatherColors',
+  MAX_PRICE = 'maxPrice',
+  MIN_PRICE = 'minPrice',
   PAGE = 'page',
   PAGE_SIZE = 'pageSize',
   SEARCH = 'search',
