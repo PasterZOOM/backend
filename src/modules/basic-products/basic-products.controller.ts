@@ -131,8 +131,8 @@ export class BasicProductsController {
               ],
             }
           : {},
-        minPrice ? { cost: { $gt: +minPrice } } : {},
-        maxPrice ? { cost: { $lt: +maxPrice } } : {},
+        minPrice ? { cost: { $gte: +minPrice } } : {},
+        maxPrice ? { cost: { $lte: +maxPrice } } : {},
       ],
     }
 
