@@ -11,5 +11,5 @@ export class BasicProductPhotoEntity {
     type: String,
     description: 'Адрес фотографии',
   })
-  url: string
+  path: string
 }

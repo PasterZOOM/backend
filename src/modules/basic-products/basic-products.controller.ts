@@ -226,7 +226,7 @@ export class BasicProductsController {
     const product = await this.basicProductsService.findOne(id)
 
     Object.keys(photo).forEach(key => {
-      const photos = photo[key].map(url => ({ _id: v1(), url }))
+      const photos = photo[key].map(path => ({ _id: v1(), path }))
 
       if (product.photos[key]) {
         product.photos[key] = [...product.photos[key], ...photos]

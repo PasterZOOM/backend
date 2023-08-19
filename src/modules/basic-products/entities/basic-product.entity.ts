@@ -43,7 +43,7 @@ export class BasicProductEntity {
     type: Object,
     description: 'объект с фотографиями базового продукта',
     additionalProperties: { type: 'array', $ref: getSchemaPath(BasicProductPhotoEntity) },
-    example: { [v1()]: [{ _id: v1(), url: 'https://example.com/picture.ing' }] },
+    example: { [v1()]: [{ _id: v1(), path: 'https://example.com/' }] },
   })
   photos: Record<string, BasicProductPhotoEntity[]>
 
