@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 
 import { AddressesModule } from './modules/addresses/addresses.module'
@@ -11,7 +12,13 @@ import { ProductsModule } from './modules/products/products.module'
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017', { dbName: 'Pi_Straps' }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(
+      `mongodb+srv://${process.env.DB_USER_NAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.iubgsyi.mongodb.net/?retryWrites=true&w=majority`,
+      { dbName: 'pi_straps' }
+    ),
     PersonsModule,
     AddressesModule,
     OrdersModule,
