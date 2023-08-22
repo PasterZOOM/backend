@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
 import { CreateLeatherDto } from './dto/create-leather.dto'
 import { UpdateLeatherDto } from './dto/update-leather.dto'
@@ -48,25 +47,19 @@ export class LeathersController {
             const color = await this.leatherColorsService.findOne(createLeatherDto.color)
 
             if (color) return this.leathersService.create(createLeatherDto)
-
-            throw new BadIdException('color', new Error())
           }
           throw new BadRequestException('There is no such color in the article', {
             cause: new Error(),
             description: 'There is no such color in the article',
           })
-        } catch (e) {
-          throw new BadIdException('article', e)
-        }
+        } catch (e) {}
       } else {
         throw new BadRequestException('Factories do not produce such an article', {
           cause: new Error(),
           description: 'Factories do not produce such an article',
         })
       }
-    } catch (e) {
-      throw new BadIdException('factory', e)
-    }
+    } catch (e) {}
   }
 
   @Get()

@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 import { getOrderNumber } from 'src/common/utils/string/getOrderNumber'
 
 import { PersonsService } from '../persons/persons.service'
@@ -50,9 +49,7 @@ export class OrdersController {
       await this.personsService.push(person._id, { orderIds: createdOrder._id })
 
       return createdOrder
-    } catch (e) {
-      throw new BadIdException('person', e)
-    }
+    } catch (e) {}
   }
 
   @Get()
@@ -84,8 +81,6 @@ export class OrdersController {
       }
 
       return this.ordersService.remove(id)
-    } catch (e) {
-      throw new BadIdException('address', e)
-    }
+    } catch (e) {}
   }
 }

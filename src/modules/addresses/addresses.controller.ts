@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { ApiOkResponse, ApiTags, PickType } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { BadIdException } from 'src/common/exceptions/badId.Exceptions'
 
 import { PersonEntity } from '../persons/entities/person.entity'
 import { PersonsService } from '../persons/persons.service'
@@ -32,9 +31,7 @@ export class AddressesController {
       await this.personsService.push(person._id, { addressIds: createdAddress._id })
 
       return createdAddress
-    } catch (e) {
-      throw new BadIdException('person', e)
-    }
+    } catch (e) {}
   }
 
   @Get()
@@ -74,8 +71,6 @@ export class AddressesController {
       }
 
       return this.addressesService.remove(id)
-    } catch (e) {
-      throw new BadIdException('address', e)
-    }
+    } catch (e) {}
   }
 }
