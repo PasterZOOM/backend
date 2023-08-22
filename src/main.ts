@@ -9,9 +9,7 @@ const port = 8001
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule)
 
-  app.enableCors({
-    origin: ['https://frontend-kappa-umber.vercel.app/'],
-  })
+  app.enableCors()
   const config = new DocumentBuilder()
     .setTitle('Pi Straps')
     .setDescription('Pi Straps API description')
