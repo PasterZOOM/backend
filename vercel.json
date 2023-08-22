@@ -1,21 +1,12 @@
 {
   "version": 2,
+  "name": "pi-straps-backend",
   "builds": [
-    {
-      "src": "src/main.ts",
-      "use": "@vercel/node"
-    }
+    { "src": "src/main.ts", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/main.ts",
-      "methods": [
-        "GET",
-        "POST",
-        "PATCH",
-        "DELETE"
-      ]
+    { "src": "(.*)", "dest": "src/main.ts",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"]
     }
   ]
 }
