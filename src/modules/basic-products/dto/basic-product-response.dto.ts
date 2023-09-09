@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger'
-import { BasicProductLeatherResponse } from 'src/modules/basic-products/entities/basic-product-leather-response.emtity'
+import { BasicProductLeatherResponse } from 'src/modules/basic-products/entities/basic-product-leather-response.entity'
 
 import { BasicProductColor } from '../entities/basic-product-color.entity'
 import { BasicProductEntity } from '../entities/basic-product.entity'
