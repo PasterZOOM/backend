@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { CostEntity } from 'src/common/interfaces/cost.entity'
+import { CostEntity } from 'common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 

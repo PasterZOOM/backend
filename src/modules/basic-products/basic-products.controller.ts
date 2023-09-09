@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
-import { LeatherArticleDocument } from 'src/modules/materials/leathers/modules/leather-articles/schemas/leather-article.schema'
-import { LeatherColorDocument } from 'src/modules/materials/leathers/modules/leather-colors/schemas/leather-color.schema'
+import { LeatherArticleDocument } from 'modules/materials/leathers/modules/leather-articles/schemas/leather-article.schema'
+import { LeatherColorDocument } from 'modules/materials/leathers/modules/leather-colors/schemas/leather-color.schema'
 import { v1 } from 'uuid'
 
 import { LeatherArticlesService } from '../materials/leathers/modules/leather-articles/leather-articles.service'

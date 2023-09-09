@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { ECountry, TCountry } from 'src/common/interfaces/country.type'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
+import { ECountry, TCountry } from 'common/interfaces/country.type'
 
 export class LeatherFactoryEntity {
   @ApiProperty({

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { FilterQuery, Model, ProjectionType, Types } from 'mongoose'
-import { LeatherFactoryDocument } from 'src/modules/materials/leathers/modules/leather-factories/schemas/leather-factory.schema'
+import { LeatherFactoryDocument } from 'modules/materials/leathers/modules/leather-factories/schemas/leather-factory.schema'
 
 import { CreateLeatherColorDto } from './dto/create-leather-color.dto'
 import { UpdateLeatherColorDto } from './dto/update-leather-color.dto'

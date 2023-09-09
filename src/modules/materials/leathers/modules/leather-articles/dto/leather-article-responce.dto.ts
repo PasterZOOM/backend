@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger'
-import { BasEntity } from 'src/common/entities/base.entity'
-import { LeatherArticleEntity } from 'src/modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
+import { BasEntity } from 'common/entities/base.entity'
+import { LeatherArticleEntity } from 'modules/materials/leathers/modules/leather-articles/entities/leather-article.entity'
 
 export class LeatherArticleResponse extends OmitType(LeatherArticleEntity, [
   'title',

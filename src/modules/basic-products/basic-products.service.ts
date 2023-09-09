@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { FilterQuery, Model, SortOrder, Types } from 'mongoose'
-import { ESort } from 'src/modules/basic-products/entities/basic-product.type'
+import { ESort } from 'modules/basic-products/entities/basic-product.type'
 
 import { CreateBasicProductDto } from './dto/create-basic-product.dto'
 import { UpdateBasicProductDto } from './dto/update-basic-product.dto'

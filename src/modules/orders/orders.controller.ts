@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { getOrderNumber } from 'src/common/utils/string/getOrderNumber'
+import { getOrderNumber } from 'common/utils/string/getOrderNumber'
 
 import { PersonsService } from '../persons/persons.service'
 

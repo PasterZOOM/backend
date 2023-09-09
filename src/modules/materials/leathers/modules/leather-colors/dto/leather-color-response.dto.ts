@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger'
-import { BasEntity } from 'src/common/entities/base.entity'
+import { BasEntity } from 'common/entities/base.entity'
 
 import { LeatherColorEntity } from '../entities/leather-color.entity'
 

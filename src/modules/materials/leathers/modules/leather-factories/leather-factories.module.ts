@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
-import { BasicProductsModule } from 'src/modules/basic-products/basic-products.module'
-import { LeatherColorsModule } from 'src/modules/materials/leathers/modules/leather-colors/leather-colors.module'
+import { BasicProductsModule } from 'modules/basic-products/basic-products.module'
+import { LeatherColorsModule } from 'modules/materials/leathers/modules/leather-colors/leather-colors.module'
 
 import { LeatherArticlesModule } from '../leather-articles/leather-articles.module'
 

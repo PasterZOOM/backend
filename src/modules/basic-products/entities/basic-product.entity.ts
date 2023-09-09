@@ -1,10 +1,10 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { BasicProductLeather } from 'src/modules/basic-products/entities/basic-product-leather.entity'
-import { BasicProductPhotoEntity } from 'src/modules/basic-products/entities/basic-product-photo.entity'
-import { EPunchPitch } from 'src/modules/materials/common/materials.type'
-import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
+import { BasicProductLeather } from 'modules/basic-products/entities/basic-product-leather.entity'
+import { BasicProductPhotoEntity } from 'modules/basic-products/entities/basic-product-photo.entity'
+import { EPunchPitch } from 'modules/materials/common/materials.type'
+import { EProductAssignment, EProductCategory } from 'modules/products/entities/product.type'
 import { v1 } from 'uuid'
 
 export class BasicProductEntity {

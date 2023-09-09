@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, SchemaTypes, Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { TCountry } from 'src/common/interfaces/country.type'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
+import { TCountry } from 'common/interfaces/country.type'
 
 import { LeatherFactoryEntity } from '../entities/leather-factory.entity'
 

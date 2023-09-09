@@ -1,4 +1,4 @@
-import { TCost } from 'src/common/interfaces/cost.type'
+import { TCost } from 'common/interfaces/cost.type'
 
 import { GetRateResponseType } from './getRateResponseType'
 

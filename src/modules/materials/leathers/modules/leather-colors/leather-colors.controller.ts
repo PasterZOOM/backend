@@ -13,9 +13,9 @@ import {
 } from '@nestjs/common'
 import { ApiQuery, ApiTags } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { BasicProductsService } from 'src/modules/basic-products/basic-products.service'
-import { LeatherFactoriesService } from 'src/modules/materials/leathers/modules/leather-factories/leather-factories.service'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
+import { BasicProductsService } from 'modules/basic-products/basic-products.service'
+import { LeatherFactoriesService } from 'modules/materials/leathers/modules/leather-factories/leather-factories.service'
 
 import { LeatherArticlesService } from '../leather-articles/leather-articles.service'
 

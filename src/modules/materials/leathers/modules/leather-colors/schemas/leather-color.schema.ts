@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, SchemaTypes, Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
 
 import { LeatherColorEntity } from '../entities/leather-color.entity'
 import { ELeatherColor } from '../entities/leather-colors.type'

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
 
 export class LeatherArticleEntity {
   @ApiProperty({ type: String, description: 'идентификационный номер артикула кожи' })

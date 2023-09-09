@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { BasicProductLeather } from 'src/modules/basic-products/entities/basic-product-leather.entity'
-import { PhotosEntity } from 'src/modules/basic-products/entities/photo.entity'
-import { EProductAssignment, EProductCategory } from 'src/modules/products/entities/product.type'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
+import { BasicProductLeather } from 'modules/basic-products/entities/basic-product-leather.entity'
+import { PhotosEntity } from 'modules/basic-products/entities/photo.entity'
+import { EProductAssignment, EProductCategory } from 'modules/products/entities/product.type'
 
 import { EPunchPitch } from '../../materials/common/materials.type'
 import { BasicProductEntity } from '../entities/basic-product.entity'

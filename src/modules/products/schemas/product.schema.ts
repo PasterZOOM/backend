@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, SchemaTypes, Types } from 'mongoose'
-import { CostEntity } from 'src/common/interfaces/cost.entity'
+import { CostEntity } from 'common/interfaces/cost.entity'
 
 import { EPunchPitch, TPunchPitch } from '../../materials/common/materials.type'
 import { ProductEntity } from '../entities/product.entity'

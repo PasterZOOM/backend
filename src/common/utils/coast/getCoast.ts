@@ -1,5 +1,5 @@
-import { currencyApi } from 'src/api/currency/currencyApi'
-import { CostEntity } from 'src/common/interfaces/cost.entity'
+import { currencyApi } from 'api/currency/currencyApi'
+import { CostEntity } from 'common/interfaces/cost.entity'
 
 import { ECost, TCost } from '../../interfaces/cost.type'
 

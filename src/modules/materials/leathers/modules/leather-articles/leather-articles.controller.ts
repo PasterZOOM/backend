@@ -13,8 +13,8 @@ import {
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { FilterQuery, Types } from 'mongoose'
-import { LocaleFieldEntity } from 'src/common/entities/locale-field.entity'
-import { BasicProductsService } from 'src/modules/basic-products/basic-products.service'
+import { LocaleFieldEntity } from 'common/entities/locale-field.entity'
+import { BasicProductsService } from 'modules/basic-products/basic-products.service'
 
 import { LeatherColorsService } from '../leather-colors/leather-colors.service'
 import { LeatherFactoriesService } from '../leather-factories/leather-factories.service'
